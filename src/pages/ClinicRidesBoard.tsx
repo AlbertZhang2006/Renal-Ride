@@ -197,10 +197,15 @@ export function ClinicRidesBoard() {
                 {/* Cards area */}
                 <div className={cn(
                   'bg-gray-50/80 rounded-b-lg border border-t-0 border-gray-200 p-2 space-y-2 min-h-[120px]',
-                  colRides.length === 0 && 'flex items-center justify-center',
+                  colRides.length === 0 && 'flex flex-col items-center justify-center',
                 )}>
                   {colRides.length === 0 ? (
-                    <p className="text-[10px] text-gray-400">No rides</p>
+                    <div className="text-center py-2">
+                      <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-1">
+                        <span className={cn('w-2 h-2 rounded-full', col.dot, 'opacity-40')} />
+                      </div>
+                      <p className="text-[10px] text-gray-400">No rides</p>
+                    </div>
                   ) : (
                     colRides.map((ride) => (
                       <RideCard

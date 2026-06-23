@@ -43,7 +43,14 @@ const riskVariant: Record<RiskLevel, 'low' | 'medium' | 'high'> = {
 // Summary stats
 // ---------------------------------------------------------------------------
 
-function useClinicStats() {
+interface StatItem {
+  label: string;
+  value: number;
+  accent: boolean;
+  icon: React.ReactNode;
+}
+
+function useClinicStats(): { stats: StatItem[]; completedPct: number; completedCount: number; totalRides: number } {
   const uniquePatients = new Set(rides.map((r) => r.patientId)).size;
   const confirmed = rides.filter((r) => r.status !== 'scheduled' && r.status !== 'canceled').length;
   const atRisk = rides.filter((r) => r.riskLevel === 'high' || r.riskLevel === 'medium').length;
@@ -55,16 +62,24 @@ function useClinicStats() {
     r.direction === 'from-clinic' && !['completed', 'canceled', 'missed', 'arrived_home', 'returning_home'].includes(r.status),
   ).length;
   const missed = rides.filter((r) => r.status === 'missed').length;
+  const completed = rides.filter((r) => r.status === 'completed').length;
 
-  return [
-    { label: 'Patients Today', value: uniquePatients, accent: false },
-    { label: 'Rides Confirmed', value: confirmed, accent: false },
-    { label: 'At-Risk Rides', value: atRisk, accent: atRisk > 0 },
-    { label: 'Late Pickups', value: late, accent: late > 0 },
-    { label: 'Patients Arrived', value: arrived, accent: false },
-    { label: 'Returns Pending', value: returnPending, accent: returnPending > 0 },
-    { label: 'Missed Rides', value: missed, accent: missed > 0 },
+  const stats: StatItem[] = [
+    { label: 'Patients Today', value: uniquePatients, accent: false, icon: <path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" /> },
+    { label: 'Rides Confirmed', value: confirmed, accent: false, icon: <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" /> },
+    { label: 'At-Risk Rides', value: atRisk, accent: atRisk > 0, icon: <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" /> },
+    { label: 'Late Pickups', value: late, accent: late > 0, icon: <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /> },
+    { label: 'At Clinic', value: arrived, accent: false, icon: <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3H21m-3.75 3H21" /> },
+    { label: 'Returns Pending', value: returnPending, accent: returnPending > 0, icon: <path strokeLinecap="round" strokeLinejoin="round" d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" /> },
+    { label: 'Missed', value: missed, accent: missed > 0, icon: <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 18.364A9 9 0 0 0 5.636 5.636m12.728 12.728A9 9 0 0 1 5.636 5.636m12.728 12.728L5.636 5.636" /> },
   ];
+
+  return {
+    stats,
+    completedPct: Math.round((completed / Math.max(rides.length, 1)) * 100),
+    completedCount: completed,
+    totalRides: rides.length,
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -318,7 +333,7 @@ export function ClinicDashboard() {
 
   const closeModal = useCallback(() => setModalState(null), []);
 
-  const stats = useClinicStats();
+  const { stats, completedPct, completedCount, totalRides } = useClinicStats();
 
   return (
     <div>
@@ -338,14 +353,47 @@ export function ClinicDashboard() {
         }
       />
 
-      {/* Summary cards */}
+      {/* Daily progress + summary cards */}
+      <div className="flex items-center gap-4 p-4 rounded-xl bg-white border border-gray-200 mb-4">
+        <div className="relative w-16 h-16 shrink-0">
+          <svg className="w-16 h-16 -rotate-90" viewBox="0 0 36 36">
+            <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#e5e7eb" strokeWidth="3" />
+            <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#10b981" strokeWidth="3" strokeDasharray={`${completedPct}, 100`} strokeLinecap="round" />
+          </svg>
+          <span className="absolute inset-0 flex items-center justify-center text-sm font-bold text-gray-900">{completedPct}%</span>
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-semibold text-gray-900">Daily Completion</p>
+          <p className="text-xs text-gray-500 mt-0.5">{completedCount} of {totalRides} rides completed today</p>
+          <div className="w-full h-1.5 bg-gray-100 rounded-full mt-2 overflow-hidden">
+            <div className="h-full bg-emerald-500 rounded-full transition-all" style={{ width: `${completedPct}%` }} />
+          </div>
+        </div>
+        <div className="hidden sm:flex items-center gap-4 shrink-0 text-center">
+          <div>
+            <p className="text-lg font-bold text-emerald-600">{completedCount}</p>
+            <p className="text-[11px] text-gray-400">Done</p>
+          </div>
+          <div className="w-px h-8 bg-gray-200" />
+          <div>
+            <p className="text-lg font-bold text-brand-600">{totalRides - completedCount}</p>
+            <p className="text-[11px] text-gray-400">Remaining</p>
+          </div>
+        </div>
+      </div>
+
       <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2.5 mb-6">
         {stats.map((s) => (
           <div key={s.label} className={cn(
             'rounded-xl border px-3.5 py-3',
             s.accent ? 'bg-red-50/60 border-red-200' : 'bg-white border-gray-200',
           )}>
-            <p className="text-[11px] text-gray-500 mb-0.5 truncate">{s.label}</p>
+            <div className="flex items-center justify-between mb-1">
+              <p className="text-[11px] text-gray-500 truncate">{s.label}</p>
+              <svg className={cn('w-3.5 h-3.5 shrink-0', s.accent ? 'text-red-400' : 'text-gray-300')} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                {s.icon}
+              </svg>
+            </div>
             <p className={cn('text-lg font-semibold', s.accent ? 'text-red-600' : 'text-gray-900')}>
               {s.value}
             </p>
@@ -404,8 +452,12 @@ export function ClinicDashboard() {
             <tbody>
               {filteredRides.length === 0 && (
                 <tr>
-                  <td colSpan={9} className="px-5 py-10 text-center text-sm text-gray-400">
-                    No rides match this filter.
+                  <td colSpan={9} className="px-5 py-16 text-center">
+                    <svg className="w-10 h-10 text-gray-200 mx-auto mb-3" fill="none" viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0H21M3.375 14.25h-.375a1.5 1.5 0 0 1-1.5-1.5v-3a1.5 1.5 0 0 1 1.5-1.5h17.25a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1-1.5 1.5h-.375m-17.25 0h17.25M6.75 6.75h10.5" />
+                    </svg>
+                    <p className="text-sm font-medium text-gray-400">No rides match "{filters.find((f) => f.key === filter)?.label}"</p>
+                    <p className="text-xs text-gray-300 mt-1">Try a different filter or check back later</p>
                   </td>
                 </tr>
               )}

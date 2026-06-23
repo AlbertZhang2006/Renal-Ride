@@ -340,13 +340,15 @@ export function ClinicStandingOrders() {
   // ── Stats ──
 
   const stats = [
-    { label: 'Total Orders', value: orders.length, color: 'text-gray-900' },
-    { label: 'Active', value: counts.active, color: 'text-emerald-600' },
-    { label: 'Inactive', value: counts.inactive, color: 'text-gray-400' },
+    { label: 'Total Orders', value: orders.length, color: 'text-gray-900', bg: 'bg-gray-50', icon: <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182" /> },
+    { label: 'Active', value: counts.active, color: 'text-emerald-600', bg: 'bg-emerald-50', icon: <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z" /> },
+    { label: 'Inactive', value: counts.inactive, color: 'text-gray-400', bg: 'bg-gray-50', icon: <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 5.25v13.5m-7.5-13.5v13.5" /> },
     {
       label: 'Upcoming Exceptions',
       value: exceptions.filter((e) => !e.resolved).length,
       color: 'text-amber-600',
+      bg: 'bg-amber-50',
+      icon: <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />,
     },
   ];
 
@@ -373,8 +375,15 @@ export function ClinicStandingOrders() {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
         {stats.map((s) => (
           <Card key={s.label} className="!p-4">
-            <p className="text-xs text-gray-500">{s.label}</p>
-            <p className={cn('text-2xl font-semibold mt-1', s.color)}>{s.value}</p>
+            <div className="flex items-center justify-between mb-1.5">
+              <p className="text-xs text-gray-500">{s.label}</p>
+              <div className={cn('w-6 h-6 rounded-md flex items-center justify-center', s.bg)}>
+                <svg className={cn('w-3.5 h-3.5', s.color)} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                  {s.icon}
+                </svg>
+              </div>
+            </div>
+            <p className={cn('text-2xl font-semibold', s.color)}>{s.value}</p>
           </Card>
         ))}
       </div>
@@ -569,8 +578,12 @@ export function ClinicStandingOrders() {
               })}
               {filtered.length === 0 && (
                 <tr>
-                  <td colSpan={9} className="px-4 py-12 text-center text-sm text-gray-400">
-                    No standing orders match your filters
+                  <td colSpan={9} className="px-4 py-16 text-center">
+                    <svg className="w-10 h-10 text-gray-200 mx-auto mb-3" fill="none" viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182" />
+                    </svg>
+                    <p className="text-sm font-medium text-gray-400">No standing orders match your search</p>
+                    <p className="text-xs text-gray-300 mt-1">Try adjusting your filters or create a new standing order</p>
                   </td>
                 </tr>
               )}
@@ -1012,22 +1025,44 @@ function ViewDetailModal({
           </Badge>
         </div>
 
-        {/* Schedule */}
+        {/* Visual weekly calendar */}
         <div>
-          <p className="text-xs font-semibold text-gray-900 mb-2">Schedule</p>
-          <ModalRow label="Treatment Days">
-            <div className="flex gap-1 justify-end">
-              {order.daysOfWeek.map((d) => (
-                <span key={d} className="inline-flex items-center justify-center w-7 h-5 rounded text-[11px] font-medium bg-brand-100 text-brand-700">
-                  {d.slice(0, 2)}
-                </span>
-              ))}
-            </div>
-          </ModalRow>
+          <p className="text-xs font-semibold text-gray-900 mb-2">Weekly Schedule</p>
+          <div className="grid grid-cols-7 gap-1.5 mb-4">
+            {allDays.map((d) => {
+              const isActive = order.daysOfWeek.includes(d);
+              return (
+                <div
+                  key={d}
+                  className={cn(
+                    'flex flex-col items-center py-2.5 rounded-lg border text-center transition-colors',
+                    isActive
+                      ? 'bg-brand-50 border-brand-200'
+                      : 'bg-gray-50 border-gray-100',
+                  )}
+                >
+                  <span className={cn('text-[10px] font-medium uppercase', isActive ? 'text-brand-700' : 'text-gray-400')}>
+                    {d}
+                  </span>
+                  {isActive && (
+                    <span className="text-[10px] text-brand-600 mt-1 font-medium">{formatTime(order.pickupTime)}</span>
+                  )}
+                  {isActive && (
+                    <div className="w-1.5 h-1.5 rounded-full bg-brand-500 mt-1" />
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Schedule details */}
+        <div>
+          <p className="text-xs font-semibold text-gray-900 mb-2">Schedule Details</p>
           <ModalRow label="Pickup Time">{formatTime(order.pickupTime)}</ModalRow>
           <ModalRow label="Chair Time">{formatTime(order.chairTime)}</ModalRow>
           <ModalRow label="Start Date">{formatDate(order.startDate)}</ModalRow>
-          <ModalRow label="End Date">{order.endDate ? formatDate(order.endDate) : 'Ongoing'}</ModalRow>
+          <ModalRow label="End Date">{order.endDate ? formatDate(order.endDate) : <span className="text-emerald-600 font-medium">Ongoing</span>}</ModalRow>
         </div>
 
         {/* Transportation */}

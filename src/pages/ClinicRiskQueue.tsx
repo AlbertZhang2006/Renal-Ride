@@ -474,15 +474,18 @@ export function ClinicRiskQueue() {
           {/* Stats */}
           <div className="grid grid-cols-3 sm:grid-cols-5 gap-3 mb-5">
             {[
-              { label: 'High Risk', value: counts.high, color: 'text-red-600', bg: 'bg-red-50' },
-              { label: 'Medium', value: counts.medium, color: 'text-amber-600', bg: 'bg-amber-50' },
-              { label: 'Low', value: counts.low, color: 'text-blue-600', bg: 'bg-blue-50' },
-              { label: 'Open', value: counts.open, color: 'text-gray-900', bg: 'bg-gray-50' },
-              { label: 'Resolved', value: counts.resolved, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+              { label: 'High Risk', value: counts.high, color: 'text-red-600', bg: 'bg-red-50', dot: 'bg-red-500' },
+              { label: 'Medium', value: counts.medium, color: 'text-amber-600', bg: 'bg-amber-50', dot: 'bg-amber-500' },
+              { label: 'Low', value: counts.low, color: 'text-blue-600', bg: 'bg-blue-50', dot: 'bg-blue-500' },
+              { label: 'Open', value: counts.open, color: 'text-gray-900', bg: 'bg-gray-50', dot: 'bg-gray-400' },
+              { label: 'Resolved', value: counts.resolved, color: 'text-emerald-600', bg: 'bg-emerald-50', dot: 'bg-emerald-500' },
             ].map((s) => (
               <div key={s.label} className={cn('rounded-lg p-3 border border-gray-100', s.bg)}>
-                <p className="text-[11px] text-gray-500 font-medium">{s.label}</p>
-                <p className={cn('text-xl font-bold mt-0.5', s.color)}>{s.value}</p>
+                <div className="flex items-center gap-1.5 mb-1">
+                  <span className={cn('w-1.5 h-1.5 rounded-full', s.dot)} />
+                  <p className="text-[11px] text-gray-500 font-medium">{s.label}</p>
+                </div>
+                <p className={cn('text-xl font-bold', s.color)}>{s.value}</p>
               </div>
             ))}
           </div>
@@ -644,11 +647,34 @@ export function ClinicRiskQueue() {
             })}
 
             {sortedRisks.length === 0 && (
-              <div className="rounded-xl border border-dashed border-gray-200 py-12 text-center">
-                <svg className="w-8 h-8 text-gray-300 mx-auto mb-2" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                </svg>
-                <p className="text-sm text-gray-400">No risks match this filter</p>
+              <div className="rounded-xl border border-dashed border-gray-200 py-14 text-center">
+                {filter === 'resolved' ? (
+                  <>
+                    <svg className="w-10 h-10 text-gray-200 mx-auto mb-3" fill="none" viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+                    </svg>
+                    <p className="text-sm font-medium text-gray-400">No resolved risks yet</p>
+                    <p className="text-xs text-gray-300 mt-1">Resolved risks will be tracked here for the audit trail</p>
+                  </>
+                ) : filter === 'all' && risks.length === 0 ? (
+                  <>
+                    <div className="w-12 h-12 rounded-full bg-emerald-50 flex items-center justify-center mx-auto mb-3">
+                      <svg className="w-6 h-6 text-emerald-500" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" />
+                      </svg>
+                    </div>
+                    <p className="text-sm font-medium text-emerald-700">All clear — no active risks</p>
+                    <p className="text-xs text-gray-400 mt-1">All rides are proceeding as planned. Great work!</p>
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-10 h-10 text-gray-200 mx-auto mb-3" fill="none" viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z" />
+                    </svg>
+                    <p className="text-sm font-medium text-gray-400">No risks match this filter</p>
+                    <p className="text-xs text-gray-300 mt-1">Try selecting a different severity or status filter</p>
+                  </>
+                )}
               </div>
             )}
           </div>

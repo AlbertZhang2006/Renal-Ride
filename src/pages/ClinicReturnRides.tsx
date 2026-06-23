@@ -397,9 +397,6 @@ export function ClinicReturnRides() {
     );
   }
 
-  // Suppress unused var warning — now is used to keep timeUntil reactive
-  void now;
-
   // ══════════════════════════════════════════════════
   // Render
   // ══════════════════════════════════════════════════
@@ -473,22 +470,24 @@ export function ClinicReturnRides() {
 
       {/* Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
-        <Card className="!p-4">
-          <p className="text-xs text-gray-500">In Treatment</p>
-          <p className="text-2xl font-semibold text-brand-600 mt-1">{inTreatment.length}</p>
-        </Card>
-        <Card className="!p-4">
-          <p className="text-xs text-gray-500">Ready for Return</p>
-          <p className="text-2xl font-semibold text-amber-600 mt-1">{ready.length}</p>
-        </Card>
-        <Card className="!p-4">
-          <p className="text-xs text-gray-500">Return Assigned</p>
-          <p className="text-2xl font-semibold text-emerald-600 mt-1">{assigned.length}</p>
-        </Card>
-        <Card className="!p-4">
-          <p className="text-xs text-gray-500">Total Patients Today</p>
-          <p className="text-2xl font-semibold text-gray-900 mt-1">{sessions.length}</p>
-        </Card>
+        {[
+          { label: 'In Treatment', value: inTreatment.length, color: 'text-brand-600', bg: 'bg-brand-50', icon: <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /> },
+          { label: 'Ready for Return', value: ready.length, color: 'text-amber-600', bg: 'bg-amber-50', icon: <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /> },
+          { label: 'Driver Assigned', value: assigned.length, color: 'text-emerald-600', bg: 'bg-emerald-50', icon: <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" /> },
+          { label: 'Total Patients', value: sessions.length, color: 'text-gray-900', bg: 'bg-gray-50', icon: <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" /> },
+        ].map((s) => (
+          <Card key={s.label} className="!p-4">
+            <div className="flex items-center justify-between mb-1.5">
+              <p className="text-xs text-gray-500">{s.label}</p>
+              <div className={cn('w-6 h-6 rounded-md flex items-center justify-center', s.bg)}>
+                <svg className={cn('w-3.5 h-3.5', s.color)} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                  {s.icon}
+                </svg>
+              </div>
+            </div>
+            <p className={cn('text-2xl font-semibold', s.color)}>{s.value}</p>
+          </Card>
+        ))}
       </div>
 
       {/* ═══ Section: In Treatment ═══ */}
@@ -506,6 +505,14 @@ export function ClinicReturnRides() {
             const patient = patients.find((p) => p.id === s.patientId);
             const vendor = vendors.find((v) => v.id === s.vendorId);
             const eta = timeUntil(s.estimatedEndTime);
+            const chairStart = new Date();
+            const [ch, cm] = s.chairTime.split(':');
+            chairStart.setHours(Number(ch), Number(cm), 0, 0);
+            const endTime = new Date(s.estimatedEndTime).getTime();
+            const totalDuration = endTime - chairStart.getTime();
+            const elapsed = now - chairStart.getTime();
+            const progressPct = Math.max(0, Math.min(100, Math.round((elapsed / totalDuration) * 100)));
+
             return (
               <Card key={s.id} className="!p-0">
                 <div className="flex flex-col sm:flex-row">
@@ -523,7 +530,25 @@ export function ClinicReturnRides() {
                             <Badge variant="danger">Delayed +{s.delayMinutes}m</Badge>
                           )}
                         </div>
-                        <div className="mt-2 grid grid-cols-2 gap-x-6 gap-y-1.5">
+
+                        {/* Treatment progress bar */}
+                        <div className="mt-2 mb-3">
+                          <div className="flex items-center justify-between text-[11px] mb-1">
+                            <span className="text-gray-400">Treatment progress</span>
+                            <span className={cn('font-medium', progressPct >= 90 ? 'text-amber-600' : 'text-brand-600')}>{progressPct}%</span>
+                          </div>
+                          <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                            <div
+                              className={cn(
+                                'h-full rounded-full transition-all',
+                                progressPct >= 90 ? 'bg-amber-500' : 'bg-brand-500',
+                              )}
+                              style={{ width: `${progressPct}%` }}
+                            />
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-x-6 gap-y-1.5">
                           <div>
                             <span className="text-[11px] text-gray-400">Chair Time</span>
                             <p className="text-xs text-gray-700 font-medium">{formatTime(s.chairTime)}</p>
@@ -626,7 +651,12 @@ export function ClinicReturnRides() {
           })}
         </div>
       ) : (
-        <EmptySection message="No patients currently in treatment" className="mb-8" />
+        <EmptySection
+          message="No patients currently in treatment"
+          description="Patients will appear here when they arrive for dialysis"
+          icon={<path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />}
+          className="mb-8"
+        />
       )}
 
       {/* ═══ Section: Ready for Return ═══ */}
@@ -755,7 +785,12 @@ export function ClinicReturnRides() {
           })}
         </div>
       ) : (
-        <EmptySection message="No patients currently waiting for return" className="mb-8" />
+        <EmptySection
+          message="No patients currently waiting for return"
+          description="When a patient finishes treatment and is marked ready, they'll appear here"
+          icon={<path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />}
+          className="mb-8"
+        />
       )}
 
       {/* ═══ Section: Return Ride Assigned ═══ */}
@@ -853,7 +888,12 @@ export function ClinicReturnRides() {
           })}
         </div>
       ) : (
-        <EmptySection message="No return rides currently assigned" className="mb-8" />
+        <EmptySection
+          message="No return rides currently assigned"
+          description="Assigned rides will appear here once a vendor dispatches a driver"
+          icon={<path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />}
+          className="mb-8"
+        />
       )}
 
       {/* ════ Delay Return Modal ════ */}
@@ -1117,10 +1157,18 @@ function ActionButton({
   );
 }
 
-function EmptySection({ message, className }: { message: string; className?: string }) {
+function EmptySection({ message, description, icon, className }: { message: string; description?: string; icon?: React.ReactNode; className?: string }) {
   return (
-    <div className={cn('rounded-xl border border-dashed border-gray-200 py-8 text-center mb-8', className)}>
-      <p className="text-sm text-gray-400">{message}</p>
+    <div className={cn('rounded-xl border border-dashed border-gray-200 py-10 text-center mb-8', className)}>
+      {icon && (
+        <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-3">
+          <svg className="w-5 h-5 text-gray-300" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+            {icon}
+          </svg>
+        </div>
+      )}
+      <p className="text-sm font-medium text-gray-400">{message}</p>
+      {description && <p className="text-xs text-gray-300 mt-1">{description}</p>}
     </div>
   );
 }
