@@ -3,8 +3,8 @@
 -- =============================================================================
 --
 -- Run this AFTER the initial schema.sql has been applied.
--- This adds role, organization, and approval tracking to the profiles table,
--- and creates a trigger to auto-populate profiles when users sign up.
+-- This adds role, organization, and approval tracking to the profiles table.
+-- Profile rows are created automatically by the frontend on first login.
 --
 -- WARNING: This is for prototype/demo purposes. HIPAA/security review is
 -- required before handling real patient data in production.
@@ -28,46 +28,20 @@ ALTER TABLE profiles
 
 
 -- ---------------------------------------------------------------------------
--- Auto-create profile when a new user signs up via Supabase Auth
+-- Allow users to insert their own profile on first login
 -- ---------------------------------------------------------------------------
--- The frontend passes full_name, role, and organization_name as user metadata
--- during signUp(). This trigger reads that metadata and inserts a profile row.
---
--- Patient and caregiver roles are auto-approved; clinic, vendor, and admin
--- roles require manual approval by an admin.
+-- The frontend stores signup metadata (full_name, role, organization_name)
+-- in auth.users.user_metadata via signUp(). On first login, if no profile
+-- row exists, the frontend reads this metadata and inserts the profile.
 -- ---------------------------------------------------------------------------
 
-CREATE OR REPLACE FUNCTION handle_new_user()
-RETURNS trigger AS $$
-BEGIN
-  INSERT INTO profiles (id, full_name, email, role, organization_name, approval_status)
-  VALUES (
-    new.id,
-    COALESCE(new.raw_user_meta_data->>'full_name', ''),
-    COALESCE(new.email, ''),
-    COALESCE(new.raw_user_meta_data->>'role', 'patient'),
-    new.raw_user_meta_data->>'organization_name',
-    CASE
-      WHEN COALESCE(new.raw_user_meta_data->>'role', 'patient') IN ('patient', 'caregiver')
-        THEN 'approved'
-      ELSE 'pending'
-    END
-  );
-  RETURN new;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+CREATE POLICY "Users can insert their own profile"
+  ON profiles FOR INSERT WITH CHECK (id = auth.uid());
+
+
+-- ---------------------------------------------------------------------------
+-- Clean up any old trigger-based approach (safe to run even if it doesn't exist)
+-- ---------------------------------------------------------------------------
 
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
-CREATE TRIGGER on_auth_user_created
-  AFTER INSERT ON auth.users
-  FOR EACH ROW EXECUTE FUNCTION handle_new_user();
-
-
--- ---------------------------------------------------------------------------
--- RLS: Allow users to read their own approval_status (already covered by
--- the "Users can view their own profile" policy in schema.sql, which grants
--- SELECT on all columns where id = auth.uid()).
--- ---------------------------------------------------------------------------
-
--- No additional RLS policies needed — the existing per-table policies cover
--- the new columns.
+DROP FUNCTION IF EXISTS handle_new_user();

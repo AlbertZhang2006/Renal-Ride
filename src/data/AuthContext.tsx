@@ -86,6 +86,41 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     if (!error && data) {
       setProfile(data as UserProfile);
+    } else if (error?.code === 'PGRST116') {
+      // Profile doesn't exist yet — create it from auth user metadata
+      await createProfileFromMetadata(userId);
+      return;
+    }
+    setLoading(false);
+  }
+
+  async function createProfileFromMetadata(userId: string) {
+    if (!supabase) return;
+    const {
+      data: { user: authUser },
+    } = await supabase.auth.getUser();
+    if (!authUser) {
+      setLoading(false);
+      return;
+    }
+
+    const meta = authUser.user_metadata || {};
+    const role = meta.role || 'patient';
+    const { data: newProfile } = await supabase
+      .from('profiles')
+      .insert({
+        id: userId,
+        full_name: meta.full_name || authUser.email?.split('@')[0] || '',
+        email: authUser.email || '',
+        role,
+        organization_name: meta.organization_name || null,
+        approval_status: ['patient', 'caregiver'].includes(role) ? 'approved' : 'pending',
+      })
+      .select()
+      .single();
+
+    if (newProfile) {
+      setProfile(newProfile as UserProfile);
     }
     setLoading(false);
   }
