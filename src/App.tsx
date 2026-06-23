@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom
 import { AuthProvider, useAuth } from './data/AuthContext';
 import { RoleProvider, AuthRoleProvider, useRole } from './data/RoleContext';
 import { NotificationProvider } from './data/NotificationContext';
+import { DemoScenarioProvider } from './data/DemoScenarioContext';
 import { AppLayout } from './layouts/AppLayout';
 import { Landing } from './pages/Landing';
 import { Login } from './pages/Login';
@@ -28,7 +29,9 @@ function DemoProviders() {
   return (
     <RoleProvider>
       <NotificationProvider>
-        <Outlet />
+        <DemoScenarioProvider>
+          <Outlet />
+        </DemoScenarioProvider>
       </NotificationProvider>
     </RoleProvider>
   );

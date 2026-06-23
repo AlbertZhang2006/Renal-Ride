@@ -9,6 +9,16 @@ import { cn } from '../utils/cn';
 import { useNotifications } from '../data/NotificationContext';
 import { useRole } from '../data/RoleContext';
 import type { RideStatus } from '../types';
+import {
+  useDemoScenario,
+  DemoStatusBadge,
+  demoTimelineSteps,
+  getDemoStepIndex,
+  isDemoErrorStatus,
+  DEMO_PATIENT,
+  DEMO_CLINIC_INFO,
+  DEMO_RIDE_INFO,
+} from '../data/DemoScenarioContext';
 
 const caregiver = caregivers[0]; // Carlos Santos
 const patient = patients.find(p => p.id === caregiver.patientId)!;
@@ -255,6 +265,9 @@ export function CaregiverView() {
       {/* ===== STATUS TAB ===== */}
       {tab === 'status' && (
         <div className="space-y-5">
+          {/* Demo Scenario Section */}
+          {isDemo && <DemoScenarioSection />}
+
           {/* Greeting */}
           <div>
             <h1 className="text-2xl font-bold text-gray-900">{greeting}, {isDemo ? caregiver.name.split(' ')[0] : (user?.name?.split(' ')[0] ?? caregiver.name.split(' ')[0])}</h1>
@@ -423,6 +436,9 @@ export function CaregiverView() {
             <h1 className="text-2xl font-bold text-gray-900">Alerts</h1>
             <p className="text-base text-gray-500 mt-1">Updates about {patient.firstName}'s rides</p>
           </div>
+
+          {/* Demo Notifications in Alerts */}
+          {isDemo && <DemoAlertsSection />}
 
           {alerts.length === 0 ? (
             <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-8 text-center">
@@ -873,6 +889,231 @@ export function CaregiverView() {
           </div>
         </div>
       </Modal>
+    </div>
+  );
+}
+
+/* ===== Demo Scenario Components ===== */
+
+const demoSeverityStyles: Record<string, { bg: string; border: string; icon: string }> = {
+  info: { bg: 'bg-blue-50', border: 'border-blue-200', icon: 'text-blue-600' },
+  success: { bg: 'bg-emerald-50', border: 'border-emerald-200', icon: 'text-emerald-600' },
+  warning: { bg: 'bg-amber-50', border: 'border-amber-200', icon: 'text-amber-600' },
+  critical: { bg: 'bg-red-50', border: 'border-red-200', icon: 'text-red-600' },
+};
+
+function DemoScenarioSection() {
+  const { status, notifications, riskLevel, resetDemoScenario } = useDemoScenario();
+  const demoStep = getDemoStepIndex(status);
+  const isError = isDemoErrorStatus(status);
+
+  const caregiverNotifs = notifications
+    .filter(n => n.recipientRole === 'caregiver')
+    .slice(0, 5);
+
+  return (
+    <>
+      {/* Demo Banner */}
+      <div className="bg-violet-50 border border-violet-200 rounded-2xl px-4 py-3">
+        <p className="text-sm text-violet-700 text-center font-medium">
+          This is a sample interactive demo using fictional patient data.
+        </p>
+      </div>
+
+      {/* Mary Johnson Status Card */}
+      <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+        <div className="bg-violet-600 px-5 py-3 flex items-center justify-between">
+          <span className="text-white font-semibold text-base">{DEMO_PATIENT.name}'s Ride</span>
+          <DemoStatusBadge status={status} />
+        </div>
+        <div className="p-5 space-y-4">
+          {/* Info rows */}
+          <div className="space-y-3 bg-gray-50 rounded-xl p-4">
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-gray-500">Pickup</span>
+              <span className="text-sm font-semibold text-gray-900">{formatTime(DEMO_RIDE_INFO.pickupTime)}</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-gray-500">Clinic</span>
+              <span className="text-sm font-semibold text-gray-900">{DEMO_CLINIC_INFO.name}</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-gray-500">Chair</span>
+              <span className="text-sm font-semibold text-gray-900">{formatTime(DEMO_RIDE_INFO.chairTime)}</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-gray-500">Driver</span>
+              <span className="text-sm font-semibold text-gray-900">{DEMO_RIDE_INFO.driverName}</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-gray-500">Vehicle</span>
+              <span className="text-sm font-semibold text-gray-900">{DEMO_RIDE_INFO.rideType}</span>
+            </div>
+          </div>
+
+          {/* Risk level badge */}
+          {(riskLevel === 'medium' || riskLevel === 'high') && (
+            <div className={cn(
+              'inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold',
+              riskLevel === 'medium' && 'bg-amber-100 text-amber-800',
+              riskLevel === 'high' && 'bg-red-100 text-red-800',
+            )}>
+              <span className={cn(
+                'w-2 h-2 rounded-full',
+                riskLevel === 'medium' && 'bg-amber-500',
+                riskLevel === 'high' && 'bg-red-500',
+              )} />
+              {riskLevel === 'medium' ? 'Medium Risk' : 'High Risk'}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Demo Timeline */}
+      <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">{DEMO_PATIENT.firstName}'s Journey</h3>
+        <div className="space-y-0">
+          {demoTimelineSteps.map((step, i) => {
+            const isCompleted = i <= 1 || i < demoStep;
+            const isCurrent = i === demoStep;
+            const isErrorStep = isCurrent && isError;
+            return (
+              <div key={step.key} className="flex items-start gap-4">
+                <div className="flex flex-col items-center">
+                  <div className={cn(
+                    'w-7 h-7 rounded-full flex items-center justify-center shrink-0 border-2',
+                    isErrorStep && 'bg-red-500 border-red-500',
+                    !isErrorStep && isCompleted && 'bg-emerald-500 border-emerald-500',
+                    !isErrorStep && isCurrent && 'bg-violet-500 border-violet-500',
+                    !isErrorStep && !isCompleted && !isCurrent && 'bg-white border-gray-300',
+                  )}>
+                    {isErrorStep ? (
+                      <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+                      </svg>
+                    ) : isCompleted ? (
+                      <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                      </svg>
+                    ) : isCurrent ? (
+                      <div className="w-2.5 h-2.5 bg-white rounded-full animate-pulse" />
+                    ) : (
+                      <div className="w-2 h-2 bg-gray-300 rounded-full" />
+                    )}
+                  </div>
+                  {i < demoTimelineSteps.length - 1 && (
+                    <div className={cn(
+                      'w-0.5 h-7',
+                      (i <= 1 || i < demoStep) ? 'bg-emerald-500' : 'bg-gray-200',
+                    )} />
+                  )}
+                </div>
+                <div className={cn(
+                  'pt-1 pb-3',
+                  isErrorStep && 'font-semibold text-red-700',
+                  !isErrorStep && isCurrent && 'font-semibold text-violet-700',
+                  !isErrorStep && isCompleted && 'text-gray-600',
+                  !isErrorStep && !isCompleted && !isCurrent && 'text-gray-400',
+                )}>
+                  <p className="text-sm leading-tight">{step.label}</p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Recent Updates (Notifications) */}
+      {caregiverNotifs.length > 0 && (
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5">
+          <h3 className="text-lg font-semibold text-gray-900 mb-3">Recent Updates</h3>
+          <div className="space-y-3">
+            {caregiverNotifs.map(notif => {
+              const style = demoSeverityStyles[notif.severity] ?? demoSeverityStyles.info;
+              return (
+                <div
+                  key={notif.id}
+                  className={cn('rounded-xl border p-3', style.bg, style.border)}
+                >
+                  <p className={cn('text-sm font-semibold', style.icon)}>{notif.title}</p>
+                  <p className="text-sm text-gray-700 mt-0.5">{notif.message}</p>
+                  <p className="text-xs text-gray-400 mt-1">{formatTime(notif.timestamp)}</p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Reset Demo */}
+      <div className="text-center">
+        <button
+          onClick={resetDemoScenario}
+          className="text-sm text-violet-600 hover:text-violet-800 font-medium underline underline-offset-2 cursor-pointer"
+        >
+          Reset Demo
+        </button>
+      </div>
+    </>
+  );
+}
+
+function DemoAlertsSection() {
+  const { notifications } = useDemoScenario();
+
+  const caregiverNotifs = notifications
+    .filter(n => n.recipientRole === 'caregiver')
+    .slice(0, 5);
+
+  if (caregiverNotifs.length === 0) return null;
+
+  return (
+    <div className="space-y-3">
+      <h2 className="text-base font-semibold text-violet-700">Demo Notifications</h2>
+      {caregiverNotifs.map(notif => {
+        const style = demoSeverityStyles[notif.severity] ?? demoSeverityStyles.info;
+        return (
+          <div
+            key={notif.id}
+            className={cn('rounded-2xl border p-4', style.bg, style.border)}
+          >
+            <div className="flex items-start gap-3">
+              <div className={cn('w-10 h-10 rounded-full flex items-center justify-center shrink-0',
+                notif.severity === 'info' && 'bg-blue-100',
+                notif.severity === 'success' && 'bg-emerald-100',
+                notif.severity === 'warning' && 'bg-amber-100',
+                notif.severity === 'critical' && 'bg-red-100',
+              )}>
+                {notif.severity === 'info' && (
+                  <svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
+                  </svg>
+                )}
+                {notif.severity === 'success' && (
+                  <svg className="w-5 h-5 text-emerald-600" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                  </svg>
+                )}
+                {notif.severity === 'warning' && (
+                  <svg className="w-5 h-5 text-amber-600" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+                  </svg>
+                )}
+                {notif.severity === 'critical' && (
+                  <svg className="w-5 h-5 text-red-600" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+                  </svg>
+                )}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-base font-semibold text-gray-900">{notif.title}</p>
+                <p className="text-sm text-gray-600 mt-0.5">{notif.message}</p>
+                <p className="text-xs text-gray-400 mt-1">{formatTime(notif.timestamp)}</p>
+              </div>
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }

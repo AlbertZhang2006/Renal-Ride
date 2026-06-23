@@ -8,6 +8,16 @@ import { Modal } from '../components/Modal';
 import { RideDetail } from '../components/RideDetail';
 import { cn } from '../utils/cn';
 import { useNotifications } from '../data/NotificationContext';
+import {
+  useDemoScenario,
+  DemoStatusBadge,
+  DEMO_PATIENT,
+  DEMO_CLINIC_INFO,
+  DEMO_RIDE_INFO,
+  isDemoErrorStatus,
+  isDemoTerminalStatus,
+  demoStatusLabels,
+} from '../data/DemoScenarioContext';
 import type { Ride, RideStatus, RiskLevel } from '../types';
 
 // Demo vendor: CareRide Medical Transport
@@ -109,6 +119,8 @@ export function VendorView() {
   const isDemo = location.pathname.startsWith('/demo');
 
   const { addNotification, addAuditLogEntry, addToast: addGlobalToast } = useNotifications();
+
+  const demo = useDemoScenario();
 
   const [rideStates, setRideStates] = useState<Record<string, RideStatus>>(() => {
     const initial: Record<string, RideStatus> = {};
@@ -225,6 +237,208 @@ export function VendorView() {
       {/* ===== DISPATCH TAB ===== */}
       {tab === 'dispatch' && (
         <div className="space-y-5">
+
+          {/* Demo Scenario — Active Trip Card */}
+          {isDemo && (
+            <>
+              {/* Demo Banner */}
+              <div className="rounded-xl bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-800">
+                This is a sample interactive demo using fictional patient data.
+              </div>
+
+              {/* Active Trip Card */}
+              <div className="bg-white rounded-2xl border-2 border-amber-300 shadow-sm overflow-hidden">
+                {/* Header bar */}
+                <div className="flex items-center justify-between px-4 py-3 bg-amber-50 border-b border-amber-200">
+                  <h2 className="text-base font-semibold text-gray-900">
+                    Active Trip &mdash; {DEMO_PATIENT.firstName} {DEMO_PATIENT.lastName}
+                  </h2>
+                  <DemoStatusBadge status={demo.status} />
+                </div>
+
+                <div className="p-4 space-y-4">
+                  {/* Patient response tag */}
+                  {demo.status === 'patient_ready' && (
+                    <div className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-50 border border-emerald-200 px-3 py-1.5 text-xs font-medium text-emerald-700">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                      Patient confirmed ready
+                    </div>
+                  )}
+                  {demo.status === 'patient_needs_help' && (
+                    <div className="inline-flex items-center gap-1.5 rounded-lg bg-amber-50 border border-amber-200 px-3 py-1.5 text-xs font-medium text-amber-700">
+                      <span className="w-2 h-2 rounded-full bg-amber-500" />
+                      Patient needs assistance
+                    </div>
+                  )}
+                  {demo.status === 'patient_not_ready' && (
+                    <div className="inline-flex items-center gap-1.5 rounded-lg bg-red-50 border border-red-200 px-3 py-1.5 text-xs font-medium text-red-700">
+                      <span className="w-2 h-2 rounded-full bg-red-500" />
+                      Patient not ready
+                    </div>
+                  )}
+                  {demo.status === 'cancel_requested' && (
+                    <div className="inline-flex items-center gap-1.5 rounded-lg bg-red-50 border border-red-200 px-3 py-1.5 text-xs font-medium text-red-700">
+                      <span className="w-2 h-2 rounded-full bg-red-500" />
+                      Patient requested cancellation
+                    </div>
+                  )}
+                  {demo.status === 'readiness_prompt_sent' && (
+                    <div className="inline-flex items-center gap-1.5 rounded-lg bg-amber-50 border border-amber-200 px-3 py-1.5 text-xs font-medium text-amber-700">
+                      <span className="w-2 h-2 rounded-full bg-amber-500" />
+                      Readiness check sent — awaiting patient response
+                    </div>
+                  )}
+                  {demo.status === 'driver_en_route_to_patient' && (
+                    <div className="inline-flex items-center gap-1.5 rounded-lg bg-blue-50 border border-blue-200 px-3 py-1.5 text-xs font-medium text-blue-700">
+                      <span className="w-2 h-2 rounded-full bg-blue-500" />
+                      Driver en route to patient
+                    </div>
+                  )}
+                  {demo.status === 'driver_arrived' && (
+                    <div className="inline-flex items-center gap-1.5 rounded-lg bg-blue-50 border border-blue-200 px-3 py-1.5 text-xs font-medium text-blue-700">
+                      <span className="w-2 h-2 rounded-full bg-blue-500" />
+                      Driver arrived — waiting for patient
+                    </div>
+                  )}
+                  {(demo.status === 'picked_up' || demo.status === 'en_route_to_clinic') && (
+                    <div className="inline-flex items-center gap-1.5 rounded-lg bg-blue-50 border border-blue-200 px-3 py-1.5 text-xs font-medium text-blue-700">
+                      <span className="w-2 h-2 rounded-full bg-blue-500" />
+                      Patient onboard — en route to clinic
+                    </div>
+                  )}
+                  {demo.status === 'arrived_at_clinic' && (
+                    <div className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-50 border border-emerald-200 px-3 py-1.5 text-xs font-medium text-emerald-700">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                      Arrived at clinic
+                    </div>
+                  )}
+                  {demo.status === 'in_treatment' && (
+                    <div className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-50 border border-emerald-200 px-3 py-1.5 text-xs font-medium text-emerald-700">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                      Patient in treatment
+                    </div>
+                  )}
+                  {demo.status === 'pickup_failed' && (
+                    <div className="inline-flex items-center gap-1.5 rounded-lg bg-red-50 border border-red-200 px-3 py-1.5 text-xs font-medium text-red-700">
+                      <span className="w-2 h-2 rounded-full bg-red-500" />
+                      Pickup failed
+                    </div>
+                  )}
+
+                  {/* Trip details */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-sm">
+                    <div className="flex items-start gap-2">
+                      <span className="text-gray-400 w-20 shrink-0">Pickup</span>
+                      <span className="text-gray-900">{DEMO_PATIENT.address}</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <span className="text-gray-400 w-20 shrink-0">Clinic</span>
+                      <span className="text-gray-900">{DEMO_CLINIC_INFO.name}, {DEMO_CLINIC_INFO.address.split(',')[0]}</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <span className="text-gray-400 w-20 shrink-0">Pickup time</span>
+                      <span className="text-gray-900 font-medium">{formatTime(DEMO_RIDE_INFO.pickupTime)}</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <span className="text-gray-400 w-20 shrink-0">Chair time</span>
+                      <span className="text-gray-900 font-medium">{formatTime(DEMO_RIDE_INFO.chairTime)}</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <span className="text-gray-400 w-20 shrink-0">Ride type</span>
+                      <span className="text-gray-900">{DEMO_RIDE_INFO.rideType}</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <span className="text-gray-400 w-20 shrink-0">Assistance</span>
+                      <span className="text-gray-900">{DEMO_RIDE_INFO.assistance}</span>
+                    </div>
+                  </div>
+
+                  {/* Driver info */}
+                  <div className="flex items-center gap-2 text-xs text-gray-500 bg-gray-50 rounded-lg px-3 py-2">
+                    <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+                    </svg>
+                    <span>{DEMO_RIDE_INFO.driverName} &middot; {DEMO_RIDE_INFO.vendorName}</span>
+                  </div>
+
+                  {/* Driver action buttons */}
+                  {(demo.status === 'driver_en_route_to_patient' || demo.status === 'readiness_prompt_sent' || demo.status === 'patient_ready' || demo.status === 'patient_needs_help' || demo.status === 'patient_not_ready') && (
+                    <div className="flex flex-wrap gap-2 pt-1">
+                      {demo.status === 'driver_en_route_to_patient' && (
+                        <button
+                          onClick={() => demo.sendReadinessPrompt()}
+                          className="px-4 py-2.5 rounded-xl text-sm font-semibold bg-amber-500 text-white hover:bg-amber-600 active:bg-amber-700 transition-colors cursor-pointer"
+                        >
+                          Send Readiness Check
+                        </button>
+                      )}
+                      <button
+                        onClick={() => demo.driverArrived()}
+                        className="px-4 py-2.5 rounded-xl text-sm font-semibold bg-amber-500 text-white hover:bg-amber-600 active:bg-amber-700 transition-colors cursor-pointer"
+                      >
+                        Arrived
+                      </button>
+                      <button
+                        onClick={() => demo.pickupFailed()}
+                        className="px-4 py-2.5 rounded-xl text-sm font-medium bg-white border border-red-300 text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
+                      >
+                        Unable to Pick Up
+                      </button>
+                    </div>
+                  )}
+
+                  {demo.status === 'driver_arrived' && (
+                    <div className="flex flex-wrap gap-2 pt-1">
+                      <button
+                        onClick={() => demo.patientPickedUp()}
+                        className="px-4 py-2.5 rounded-xl text-sm font-semibold bg-amber-500 text-white hover:bg-amber-600 active:bg-amber-700 transition-colors cursor-pointer"
+                      >
+                        Patient Onboard
+                      </button>
+                      <button
+                        onClick={() => demo.pickupFailed()}
+                        className="px-4 py-2.5 rounded-xl text-sm font-medium bg-white border border-red-300 text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
+                      >
+                        Unable to Pick Up
+                      </button>
+                    </div>
+                  )}
+
+                  {demo.status === 'en_route_to_clinic' && (
+                    <div className="flex flex-wrap gap-2 pt-1">
+                      <button
+                        onClick={() => demo.arrivedAtClinic()}
+                        className="px-4 py-2.5 rounded-xl text-sm font-semibold bg-amber-500 text-white hover:bg-amber-600 active:bg-amber-700 transition-colors cursor-pointer"
+                      >
+                        Arrived at Clinic
+                      </button>
+                    </div>
+                  )}
+
+                  {(isDemoTerminalStatus(demo.status) || demo.status === 'arrived_at_clinic') && (
+                    <div className={cn(
+                      'rounded-lg px-3 py-2 text-sm font-medium',
+                      isDemoErrorStatus(demo.status) ? 'bg-red-50 text-red-700' : 'bg-emerald-50 text-emerald-700',
+                    )}>
+                      {demoStatusLabels[demo.status]}
+                      {demo.status === 'arrived_at_clinic' && ' — trip complete'}
+                    </div>
+                  )}
+
+                  {/* Reset Demo */}
+                  <div className="pt-1">
+                    <button
+                      onClick={() => demo.resetDemoScenario()}
+                      className="text-xs text-gray-400 hover:text-gray-600 underline transition-colors cursor-pointer"
+                    >
+                      Reset Demo
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-lg font-semibold text-gray-900">Dispatch Board</h1>
@@ -450,6 +664,126 @@ export function VendorView() {
       {/* ===== ASSIGNED TRIPS TAB ===== */}
       {tab === 'trips' && (
         <div className="space-y-5">
+
+          {/* Demo Scenario — Trip Status Card */}
+          {isDemo && (
+            <>
+              <div className="rounded-xl bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-800">
+                This is a sample interactive demo using fictional patient data.
+              </div>
+
+              <div className="bg-white rounded-2xl border-2 border-amber-300 shadow-sm p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
+                      <svg className="w-5 h-5 text-amber-600" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0H21M3.375 14.25h-.375a1.5 1.5 0 0 1-1.5-1.5v-3a1.5 1.5 0 0 1 1.5-1.5h17.25a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1-1.5 1.5h-.375m-17.25 0h17.25M6.75 6.75h10.5" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-base font-semibold text-gray-900">{DEMO_PATIENT.firstName} {DEMO_PATIENT.lastName}</p>
+                      <p className="text-xs text-gray-500">{DEMO_RIDE_INFO.driverName} &middot; {DEMO_RIDE_INFO.rideType}</p>
+                    </div>
+                  </div>
+                  <DemoStatusBadge status={demo.status} />
+                </div>
+
+                <div className="space-y-1.5 text-xs text-gray-600">
+                  <div className="flex items-center gap-2">
+                    <span className="text-gray-400 w-14 shrink-0">Pickup</span>
+                    <span className="font-medium">{formatTime(DEMO_RIDE_INFO.pickupTime)}</span>
+                    <span className="text-gray-300">&middot;</span>
+                    <span className="truncate">{DEMO_PATIENT.address}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-gray-400 w-14 shrink-0">Clinic</span>
+                    <span className="truncate">{DEMO_CLINIC_INFO.name}, {DEMO_CLINIC_INFO.address.split(',')[0]}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-gray-400 w-14 shrink-0">Chair</span>
+                    <span className="font-medium">{formatTime(DEMO_RIDE_INFO.chairTime)}</span>
+                    <span className="text-gray-300">&middot;</span>
+                    <span>{DEMO_RIDE_INFO.assistance}</span>
+                  </div>
+                </div>
+
+                {/* Action buttons (same logic as dispatch card) */}
+                {(demo.status === 'driver_en_route_to_patient' || demo.status === 'readiness_prompt_sent' || demo.status === 'patient_ready' || demo.status === 'patient_needs_help' || demo.status === 'patient_not_ready') && (
+                  <div className="flex items-center gap-2">
+                    {demo.status === 'driver_en_route_to_patient' && (
+                      <button
+                        onClick={() => demo.sendReadinessPrompt()}
+                        className="flex-1 px-3 py-2 rounded-xl text-xs font-semibold bg-amber-500 text-white hover:bg-amber-600 transition-colors cursor-pointer"
+                      >
+                        Send Readiness Check
+                      </button>
+                    )}
+                    <button
+                      onClick={() => demo.driverArrived()}
+                      className="flex-1 px-3 py-2 rounded-xl text-xs font-semibold bg-amber-500 text-white hover:bg-amber-600 transition-colors cursor-pointer"
+                    >
+                      Arrived
+                    </button>
+                    <button
+                      onClick={() => demo.pickupFailed()}
+                      className="px-3 py-2 rounded-xl text-xs font-medium bg-white border border-red-300 text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
+                    >
+                      Unable to Pick Up
+                    </button>
+                  </div>
+                )}
+
+                {demo.status === 'driver_arrived' && (
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => demo.patientPickedUp()}
+                      className="flex-1 px-3 py-2 rounded-xl text-xs font-semibold bg-amber-500 text-white hover:bg-amber-600 transition-colors cursor-pointer"
+                    >
+                      Patient Onboard
+                    </button>
+                    <button
+                      onClick={() => demo.pickupFailed()}
+                      className="px-3 py-2 rounded-xl text-xs font-medium bg-white border border-red-300 text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
+                    >
+                      Unable to Pick Up
+                    </button>
+                  </div>
+                )}
+
+                {demo.status === 'en_route_to_clinic' && (
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => demo.arrivedAtClinic()}
+                      className="flex-1 px-3 py-2 rounded-xl text-xs font-semibold bg-amber-500 text-white hover:bg-amber-600 transition-colors cursor-pointer"
+                    >
+                      Arrived at Clinic
+                    </button>
+                  </div>
+                )}
+
+                {/* Terminal status message */}
+                {(isDemoTerminalStatus(demo.status) || demo.status === 'arrived_at_clinic') && (
+                  <div className={cn(
+                    'rounded-lg px-3 py-2 text-xs font-medium',
+                    isDemoErrorStatus(demo.status) ? 'bg-red-50 text-red-700' : 'bg-emerald-50 text-emerald-700',
+                  )}>
+                    {demoStatusLabels[demo.status]}
+                  </div>
+                )}
+
+                {/* Reset Demo */}
+                <div>
+                  <button
+                    onClick={() => demo.resetDemoScenario()}
+                    className="text-xs text-gray-400 hover:text-gray-600 underline transition-colors cursor-pointer"
+                  >
+                    Reset Demo
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
+
           <div>
             <h1 className="text-lg font-semibold text-gray-900">Assigned Trips</h1>
             <p className="text-sm text-gray-500 mt-0.5">{assignedTrips.length} trips with drivers en route or on-site</p>

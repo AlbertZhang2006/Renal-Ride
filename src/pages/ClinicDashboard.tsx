@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
+import { useLocation } from 'react-router-dom';
 import { rides, patients, vendors, clinic } from '../data/mock';
 import { StatusPill } from '../components/StatusPill';
 import { Badge } from '../components/Badge';
@@ -8,6 +9,15 @@ import { RideDetail } from '../components/RideDetail';
 import { cn } from '../utils/cn';
 import { getPatientName, formatTime, getRideStatusLabel } from '../utils/helpers';
 import type { Ride, RiskLevel, Patient } from '../types';
+import {
+  useDemoScenario,
+  DemoStatusBadge,
+  DEMO_PATIENT,
+  DEMO_RIDE_INFO,
+  isDemoErrorStatus,
+  demoStatusLabels,
+  type DemoRideStatus,
+} from '../data/DemoScenarioContext';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -321,6 +331,214 @@ function CallVendorModal({ ride, onClose }: { ride: Ride; onClose: () => void })
 }
 
 // ---------------------------------------------------------------------------
+// Demo scenario components (only rendered when isDemo is true)
+// ---------------------------------------------------------------------------
+
+const demoRiskMessages: Record<string, string> = {
+  patient_needs_help: 'Mary Johnson needs assistance — check with caregiver',
+  patient_not_ready: 'Mary Johnson not ready for pickup — chair time 9:00 AM at risk',
+  cancel_requested: 'Mary Johnson canceled ride — 9:00 AM slot needs attention',
+  pickup_failed: 'Pickup failed for Mary Johnson — immediate action needed',
+};
+
+function DemoBanner() {
+  const { resetDemoScenario } = useDemoScenario();
+  return (
+    <div className="flex items-center justify-between rounded-xl px-4 py-3 mb-4" style={{ background: '#ecfdf5', border: '1px solid #a7f3d0' }}>
+      <div className="flex items-center gap-2">
+        <svg className="w-4 h-4 text-teal-600 shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
+        </svg>
+        <p className="text-xs font-medium text-teal-800">
+          This is a sample interactive demo using fictional patient data.
+        </p>
+      </div>
+      <button
+        onClick={resetDemoScenario}
+        className="inline-flex items-center gap-1.5 text-[11px] font-medium text-teal-700 hover:text-teal-900 bg-white/70 hover:bg-white border border-teal-200 rounded-lg px-2.5 py-1 transition-colors cursor-pointer"
+      >
+        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182" />
+        </svg>
+        Reset Demo
+      </button>
+    </div>
+  );
+}
+
+function DemoMaryJohnsonCard() {
+  const { status, riskLevel, startTreatment } = useDemoScenario();
+  const isRisk = isDemoErrorStatus(status) || status === 'patient_needs_help' || status === 'patient_not_ready';
+  const statusDescription = demoStatusLabels[status];
+
+  return (
+    <div
+      className={cn('bg-white rounded-xl mb-4 overflow-hidden', isRisk ? 'ring-1 ring-red-200' : '')}
+      style={{ border: '1px solid #eaeaea', borderLeft: `4px solid ${isRisk ? '#dc2626' : '#0d9488'}` }}
+    >
+      <div className="p-4">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+          {/* Left: Avatar + Name + Status */}
+          <div className="flex items-center gap-3 min-w-0">
+            <div
+              className="flex items-center justify-center shrink-0"
+              style={{
+                height: 38,
+                width: 38,
+                borderRadius: 999,
+                background: isRisk ? '#fef2f2' : '#ecfdf5',
+                fontSize: 13,
+                fontWeight: 600,
+                color: isRisk ? '#b91c1c' : '#0d9488',
+              }}
+            >
+              MJ
+            </div>
+            <div className="min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <p className="text-sm font-semibold text-gray-900 m-0">{DEMO_PATIENT.name}</p>
+                <DemoStatusBadge status={status} />
+              </div>
+              <p className="text-xs text-gray-500 m-0 mt-0.5">{statusDescription} — Interactive demo patient</p>
+            </div>
+          </div>
+
+          {/* Right: Ride info */}
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 sm:ml-auto text-xs text-gray-600">
+            <span className="inline-flex items-center gap-1">
+              <svg className="w-3.5 h-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+              </svg>
+              Chair {formatTime(DEMO_RIDE_INFO.chairTime)}
+            </span>
+            <span className="inline-flex items-center gap-1">
+              <svg className="w-3.5 h-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0H21M3.375 14.25h-.375a1.5 1.5 0 0 1-1.5-1.5v-3a1.5 1.5 0 0 1 1.5-1.5h17.25a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1-1.5 1.5h-.375m-17.25 0h17.25M6.75 6.75h10.5" />
+              </svg>
+              Pickup {formatTime(DEMO_RIDE_INFO.pickupTime)}
+            </span>
+            <span>{DEMO_RIDE_INFO.rideType}</span>
+            <span>{DEMO_RIDE_INFO.assistance}</span>
+            <span>{DEMO_RIDE_INFO.driverName}</span>
+            <Badge variant={riskLevel === 'low' ? 'low' : riskLevel === 'medium' ? 'medium' : 'high'}>{riskLevel}</Badge>
+          </div>
+        </div>
+
+        {/* Action area */}
+        {status === 'arrived_at_clinic' && (
+          <div className="mt-3 pt-3 border-t border-gray-100">
+            <button
+              onClick={startTreatment}
+              className="inline-flex items-center gap-1.5 text-xs font-medium text-white bg-teal-600 hover:bg-teal-700 rounded-lg px-3 py-1.5 transition-colors cursor-pointer"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z" />
+              </svg>
+              Start Treatment
+            </button>
+          </div>
+        )}
+
+        {/* Risk warning */}
+        {isRisk && (
+          <div className="mt-3 pt-3 border-t border-red-100">
+            <div className="flex items-center gap-2 text-xs font-medium text-red-700 bg-red-50 rounded-lg px-3 py-2">
+              <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+              </svg>
+              {isDemoErrorStatus(status) ? 'Danger' : 'Warning'}: {demoRiskMessages[status]}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function DemoRiskAlert() {
+  const { status } = useDemoScenario();
+  const riskStatuses: DemoRideStatus[] = ['patient_needs_help', 'patient_not_ready', 'cancel_requested', 'pickup_failed'];
+  if (!riskStatuses.includes(status)) return null;
+
+  const isDanger = isDemoErrorStatus(status);
+
+  return (
+    <div
+      className={cn('rounded-xl px-4 py-3 mb-4 flex items-center gap-2', isDanger ? 'bg-red-50' : 'bg-amber-50')}
+      style={{ border: isDanger ? '1px solid #fecaca' : '1px solid #fde68a' }}
+    >
+      <svg
+        className={cn('w-4 h-4 shrink-0', isDanger ? 'text-red-500' : 'text-amber-500')}
+        fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"
+      >
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+      </svg>
+      <span className={cn('text-xs font-semibold', isDanger ? 'text-red-700' : 'text-amber-700')}>
+        Risk Alert
+      </span>
+      <span className={cn('text-xs', isDanger ? 'text-red-600' : 'text-amber-600')}>
+        {demoRiskMessages[status]}
+      </span>
+    </div>
+  );
+}
+
+function DemoEventFeed() {
+  const { events } = useDemoScenario();
+  const visibleEvents = events.slice(0, 8);
+
+  return (
+    <div className="mt-4 bg-white rounded-xl overflow-hidden" style={{ border: '1px solid #eaeaea' }}>
+      {/* Header */}
+      <div className="flex items-center gap-2 px-4 py-3" style={{ borderBottom: '1px solid #f0f0f0' }}>
+        <span className="relative flex h-2 w-2">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+          <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+        </span>
+        <h2 style={{ fontSize: 14, fontWeight: 600, margin: 0 }}>Live Demo Event Feed</h2>
+        <span className="text-[10px] text-gray-400 ml-auto">{visibleEvents.length} of {events.length} events</span>
+      </div>
+
+      {/* Event list */}
+      <div className="max-h-64 overflow-y-auto">
+        {visibleEvents.length === 0 ? (
+          <div className="px-4 py-8 text-center">
+            <p className="text-xs text-gray-400">No events yet. Interact with the demo to generate events.</p>
+          </div>
+        ) : (
+          <div className="divide-y divide-gray-50">
+            {visibleEvents.map((event) => {
+              const time = new Date(event.timestamp);
+              const timeStr = time.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true });
+              return (
+                <div key={event.id} className="px-4 py-2.5 hover:bg-gray-50/50 transition-colors">
+                  <div className="flex items-start gap-3">
+                    <span
+                      className="text-[10px] text-gray-400 shrink-0 mt-0.5"
+                      style={{ fontFamily: "'Geist Mono', monospace", minWidth: 82 }}
+                    >
+                      {timeStr}
+                    </span>
+                    <div className="min-w-0">
+                      <p className="text-xs m-0">
+                        <span className="font-semibold text-gray-900">{event.action}</span>
+                        <span className="text-gray-400 mx-1.5">&middot;</span>
+                        <span className="text-gray-500">{event.actor}</span>
+                      </p>
+                      <p className="text-[11px] text-gray-400 m-0 mt-0.5 leading-relaxed">{event.detail}</p>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Main page
 // ---------------------------------------------------------------------------
 
@@ -334,6 +552,9 @@ export function ClinicDashboard() {
 
   const { stats } = useClinicStats();
 
+  const location = useLocation();
+  const isDemo = location.pathname.startsWith('/demo');
+
   return (
     <div>
       <div className="flex items-start justify-between mb-6">
@@ -344,6 +565,9 @@ export function ClinicDashboard() {
           </p>
         </div>
       </div>
+
+      {/* Demo Banner */}
+      {isDemo && <DemoBanner />}
 
       {/* KPI Row */}
       <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3 mb-4">
@@ -369,6 +593,12 @@ export function ClinicDashboard() {
           </div>
         ))}
       </div>
+
+      {/* Demo: Mary Johnson Highlighted Card */}
+      {isDemo && <DemoMaryJohnsonCard />}
+
+      {/* Demo: Risk Alert */}
+      {isDemo && <DemoRiskAlert />}
 
       {/* Transportation board */}
       <div style={{ background: '#fff', border: '1px solid #eaeaea', borderRadius: 12, overflow: 'hidden' }}>
@@ -553,6 +783,9 @@ export function ClinicDashboard() {
           <p className="text-[11px] text-gray-400">{clinic.name}</p>
         </div>
       </div>
+
+      {/* Demo: Live Event Feed */}
+      {isDemo && <DemoEventFeed />}
 
       {/* Modals */}
       {modalState?.type === 'view' && (

@@ -8,6 +8,7 @@ import { RideDetail } from '../components/RideDetail';
 import { cn } from '../utils/cn';
 import { useNotifications } from '../data/NotificationContext';
 import { useRole } from '../data/RoleContext';
+import { useDemoScenario, DemoStatusBadge, demoTimelineSteps, getDemoStepIndex, isDemoErrorStatus, DEMO_PATIENT, DEMO_CLINIC_INFO, DEMO_RIDE_INFO } from '../data/DemoScenarioContext';
 import type { RideStatus } from '../types';
 
 const patient = patients[0];
@@ -75,6 +76,7 @@ export function PatientView() {
   const isDemo = location.pathname.startsWith('/demo');
 
   const { addNotification, addAuditLogEntry, addToast } = useNotifications();
+  const demo = useDemoScenario();
   const [readyNotified, setReadyNotified] = useState(false);
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [showUnwell, setShowUnwell] = useState(false);
@@ -183,6 +185,226 @@ export function PatientView() {
       {/* ===== TODAY TAB ===== */}
       {tab === 'today' && (
         <div className="space-y-5">
+          {/* Demo Scenario Section */}
+          {isDemo && (() => {
+            const demoStepIndex = getDemoStepIndex(demo.status);
+            const isError = isDemoErrorStatus(demo.status);
+            const showReadinessAlert = demo.status === 'driver_en_route_to_patient' || demo.status === 'readiness_prompt_sent';
+            const showPatientFeedback = ['patient_ready', 'patient_needs_help', 'patient_not_ready', 'cancel_requested'].includes(demo.status);
+            const showPostPickup = ['driver_arrived', 'en_route_to_clinic', 'arrived_at_clinic', 'in_treatment', 'pickup_failed'].includes(demo.status);
+
+            return (
+              <>
+                {/* Demo Mode Banner */}
+                <div className="bg-blue-50 border border-blue-200 rounded-2xl px-4 py-3 text-sm text-blue-800">
+                  This is a sample interactive demo using fictional patient data.
+                </div>
+
+                {/* Mary Johnson's Journey Card */}
+                <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+                  <div className="px-5 py-4 flex items-center justify-between">
+                    <h2 className="text-lg font-semibold text-gray-900">Today's Journey — {DEMO_PATIENT.name}</h2>
+                    <DemoStatusBadge status={demo.status} />
+                  </div>
+                  <div className="px-5 pb-4 flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-500">
+                    <span>Pickup {formatTime(DEMO_RIDE_INFO.pickupTime)}</span>
+                    <span>&middot;</span>
+                    <span>{DEMO_CLINIC_INFO.name}</span>
+                    <span>&middot;</span>
+                    <span>Chair {formatTime(DEMO_RIDE_INFO.chairTime)}</span>
+                    <span>&middot;</span>
+                    <span>{DEMO_RIDE_INFO.rideType}</span>
+                    <span>&middot;</span>
+                    <span>{DEMO_RIDE_INFO.assistance}</span>
+                  </div>
+
+                  {/* Readiness Alert */}
+                  {showReadinessAlert && (
+                    <div className="px-5 pb-5">
+                      <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+                        <p className="text-base font-semibold text-amber-800 mb-3">Your driver is on the way. Are you ready for pickup?</p>
+                        <div className="grid grid-cols-2 gap-2">
+                          <button
+                            onClick={() => demo.patientReady()}
+                            className="px-4 py-3 rounded-xl bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700 transition-colors cursor-pointer"
+                          >
+                            I'm Ready
+                          </button>
+                          <button
+                            onClick={() => demo.patientNeedsHelp()}
+                            className="px-4 py-3 rounded-xl bg-amber-500 text-white text-sm font-semibold hover:bg-amber-600 transition-colors cursor-pointer"
+                          >
+                            I Need Help
+                          </button>
+                          <button
+                            onClick={() => demo.patientNotReady()}
+                            className="px-4 py-3 rounded-xl bg-gray-500 text-white text-sm font-semibold hover:bg-gray-600 transition-colors cursor-pointer"
+                          >
+                            I'm Not Ready
+                          </button>
+                          <button
+                            onClick={() => demo.patientCancelRequest()}
+                            className="px-4 py-3 rounded-xl bg-red-600 text-white text-sm font-semibold hover:bg-red-700 transition-colors cursor-pointer"
+                          >
+                            Cancel / Cannot Go Today
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Status Feedback */}
+                  {showPatientFeedback && (
+                    <div className="px-5 pb-5">
+                      {demo.status === 'patient_ready' && (
+                        <div className="bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3 flex items-center gap-2">
+                          <svg className="w-5 h-5 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                          </svg>
+                          <span className="text-sm text-emerald-800">You confirmed you're ready. Your driver is on the way.</span>
+                        </div>
+                      )}
+                      {demo.status === 'patient_needs_help' && (
+                        <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 flex items-center gap-2">
+                          <svg className="w-5 h-5 text-amber-600 shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+                          </svg>
+                          <span className="text-sm text-amber-800">Help is being coordinated. Your driver and clinic have been notified.</span>
+                        </div>
+                      )}
+                      {demo.status === 'patient_not_ready' && (
+                        <div className="bg-gray-100 border border-gray-300 rounded-xl px-4 py-3 flex items-center gap-2">
+                          <svg className="w-5 h-5 text-gray-600 shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M14.25 9v6m-4.5 0V9M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                          </svg>
+                          <span className="text-sm text-gray-700">Your driver has been notified you're not ready. Take your time.</span>
+                        </div>
+                      )}
+                      {demo.status === 'cancel_requested' && (
+                        <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 flex items-center gap-2">
+                          <svg className="w-5 h-5 text-red-600 shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                          </svg>
+                          <span className="text-sm text-red-800">Your cancellation has been sent. Your clinic will follow up.</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Post-pickup Messages */}
+                  {showPostPickup && (
+                    <div className="px-5 pb-5">
+                      {demo.status === 'driver_arrived' && (
+                        <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 flex items-center gap-2">
+                          <svg className="w-5 h-5 text-blue-600 shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+                          </svg>
+                          <span className="text-sm text-blue-800">Your driver has arrived! {DEMO_RIDE_INFO.driverName} is waiting outside.</span>
+                        </div>
+                      )}
+                      {demo.status === 'en_route_to_clinic' && (
+                        <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 flex items-center gap-2">
+                          <svg className="w-5 h-5 text-blue-600 shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0H21M3.375 14.25h3.75L9 11.25m0 0L11.25 3h5.625l2.625 8.25H9Z" />
+                          </svg>
+                          <span className="text-sm text-blue-800">You're on your way to {DEMO_CLINIC_INFO.name}.</span>
+                        </div>
+                      )}
+                      {demo.status === 'arrived_at_clinic' && (
+                        <div className="bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3 flex items-center gap-2">
+                          <svg className="w-5 h-5 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                          </svg>
+                          <span className="text-sm text-emerald-800">Welcome to {DEMO_CLINIC_INFO.name}.</span>
+                        </div>
+                      )}
+                      {demo.status === 'in_treatment' && (
+                        <div className="bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3 flex items-center gap-2">
+                          <svg className="w-5 h-5 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+                          </svg>
+                          <span className="text-sm text-emerald-800">Your dialysis treatment is in progress.</span>
+                        </div>
+                      )}
+                      {demo.status === 'pickup_failed' && (
+                        <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 flex items-center gap-2">
+                          <svg className="w-5 h-5 text-red-600 shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+                          </svg>
+                          <span className="text-sm text-red-800">There was an issue with your pickup. Your clinic is working on it.</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {/* Interactive Timeline */}
+                <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Timeline</h3>
+                  <div className="space-y-0">
+                    {demoTimelineSteps.map((step, i) => {
+                      const isCompleted = i <= 1 || i < demoStepIndex;
+                      const isCurrent = i === demoStepIndex;
+                      const isFuture = !isCompleted && !isCurrent;
+                      return (
+                        <div key={step.key} className="flex items-start gap-4">
+                          <div className="flex flex-col items-center">
+                            <div className={cn(
+                              'w-8 h-8 rounded-full flex items-center justify-center shrink-0 border-2',
+                              isCompleted && 'bg-emerald-500 border-emerald-500',
+                              isCurrent && !isError && 'bg-brand-500 border-brand-500',
+                              isCurrent && isError && 'bg-red-500 border-red-500',
+                              isFuture && 'bg-white border-gray-300',
+                            )}>
+                              {isCompleted ? (
+                                <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                                </svg>
+                              ) : isCurrent ? (
+                                <div className={cn(
+                                  'w-3 h-3 rounded-full animate-pulse',
+                                  isError ? 'bg-white' : 'bg-white',
+                                )} />
+                              ) : (
+                                <div className="w-2 h-2 bg-gray-300 rounded-full" />
+                              )}
+                            </div>
+                            {i < demoTimelineSteps.length - 1 && (
+                              <div className={cn(
+                                'w-0.5 h-8',
+                                i < demoStepIndex || i <= 0 ? 'bg-emerald-500' : 'bg-gray-200',
+                              )} />
+                            )}
+                          </div>
+                          <div className={cn(
+                            'pt-1.5 pb-4',
+                            isCurrent && !isError && 'font-semibold text-brand-700',
+                            isCurrent && isError && 'font-semibold text-red-700',
+                            isCompleted && 'text-gray-600',
+                            isFuture && 'text-gray-400',
+                          )}>
+                            <p className="text-base leading-tight">{step.label}</p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Reset Demo Button */}
+                  <div className="mt-4 flex justify-center">
+                    <button
+                      onClick={() => demo.resetDemoScenario()}
+                      className="px-4 py-2 text-sm font-medium text-gray-500 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer"
+                    >
+                      Reset Demo
+                    </button>
+                  </div>
+                </div>
+              </>
+            );
+          })()}
+
           {/* Greeting */}
           <div>
             <h1 className="text-2xl font-bold text-gray-900">{greeting}, {isDemo ? patient.firstName : (user?.name?.split(' ')[0] ?? patient.firstName)}</h1>
