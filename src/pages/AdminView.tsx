@@ -97,6 +97,7 @@ export function AdminView() {
   const location = useLocation();
   const navigate = useNavigate();
   const tab = tabFromPath(location.pathname);
+  const isDemo = location.pathname.startsWith('/demo');
 
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [settings, setSettings] = useState({
@@ -119,14 +120,15 @@ export function AdminView() {
     return () => clearTimeout(timer);
   }, [toasts]);
 
+  const base = isDemo ? '/demo/admin' : '/app/admin';
   const tabItems: { key: Tab; label: string; path: string }[] = [
-    { key: 'overview', label: 'Overview', path: '/app/admin' },
-    { key: 'orgs', label: 'Orgs', path: '/app/admin/orgs' },
-    { key: 'users', label: 'Users', path: '/app/admin/users' },
-    { key: 'vendors', label: 'Vendors', path: '/app/admin/vendors' },
-    { key: 'reports', label: 'Reports', path: '/app/admin/reports' },
-    { key: 'audit', label: 'Audit', path: '/app/admin/audit' },
-    { key: 'settings', label: 'Settings', path: '/app/admin/settings' },
+    { key: 'overview', label: 'Overview', path: base },
+    { key: 'orgs', label: 'Orgs', path: `${base}/orgs` },
+    { key: 'users', label: 'Users', path: `${base}/users` },
+    { key: 'vendors', label: 'Vendors', path: `${base}/vendors` },
+    { key: 'reports', label: 'Reports', path: `${base}/reports` },
+    { key: 'audit', label: 'Audit', path: `${base}/audit` },
+    { key: 'settings', label: 'Settings', path: `${base}/settings` },
   ];
 
   const filteredAudit = auditFilter === 'all'
@@ -269,7 +271,7 @@ export function AdminView() {
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-sm font-semibold text-gray-900">Recent Activity</h3>
               <button
-                onClick={() => navigate('/app/admin/audit')}
+                onClick={() => navigate(`${base}/audit`)}
                 className="text-xs font-medium text-slate-600 hover:text-slate-800 cursor-pointer"
               >
                 View all &rarr;

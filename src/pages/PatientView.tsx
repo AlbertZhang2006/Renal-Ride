@@ -98,11 +98,12 @@ export function PatientView() {
   const greeting = now.getHours() < 12 ? 'Good morning' : now.getHours() < 17 ? 'Good afternoon' : 'Good evening';
   const dateStr = `${dayFull[now.getDay()]}, ${monthFull[now.getMonth()]} ${now.getDate()}`;
 
+  const base = isDemo ? '/demo/patient' : '/app/patient';
   const tabItems: { key: Tab; label: string; path: string }[] = [
-    { key: 'today', label: 'Today', path: '/app/patient' },
-    { key: 'schedule', label: 'Schedule', path: '/app/patient/schedule' },
-    { key: 'help', label: 'Help', path: '/app/patient/help' },
-    { key: 'profile', label: 'Profile', path: '/app/patient/profile' },
+    { key: 'today', label: 'Today', path: base },
+    { key: 'schedule', label: 'Schedule', path: `${base}/schedule` },
+    { key: 'help', label: 'Help', path: `${base}/help` },
+    { key: 'profile', label: 'Profile', path: `${base}/profile` },
   ];
 
   function getUpcomingSessions(): { date: Date; dayLabel: string }[] {
@@ -312,7 +313,7 @@ export function PatientView() {
             </button>
 
             <button
-              onClick={() => navigate('/app/patient/help')}
+              onClick={() => navigate(`${base}/help`)}
               className="flex flex-col items-center justify-center gap-2 rounded-2xl p-5 min-h-[96px] font-semibold text-lg bg-amber-500 text-white hover:bg-amber-600 active:bg-amber-700 transition-colors cursor-pointer"
             >
               <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">

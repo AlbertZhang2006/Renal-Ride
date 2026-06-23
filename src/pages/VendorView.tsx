@@ -106,6 +106,7 @@ export function VendorView() {
   const location = useLocation();
   const navigate = useNavigate();
   const tab = tabFromPath(location.pathname);
+  const isDemo = location.pathname.startsWith('/demo');
 
   const { addNotification, addAuditLogEntry, addToast: addGlobalToast } = useNotifications();
 
@@ -170,12 +171,13 @@ export function VendorView() {
     return driverActiveStatuses.includes(s) || s === 'return_assigned';
   });
 
+  const base = isDemo ? '/demo/vendor' : '/app/vendor';
   const tabItems: { key: Tab; label: string; path: string }[] = [
-    { key: 'dispatch', label: 'Dispatch', path: '/app/vendor' },
-    { key: 'trips', label: 'Trips', path: '/app/vendor/trips' },
-    { key: 'drivers', label: 'Drivers', path: '/app/vendor/drivers' },
-    { key: 'issues', label: 'Issues', path: '/app/vendor/issues' },
-    { key: 'completed', label: 'Done', path: '/app/vendor/completed' },
+    { key: 'dispatch', label: 'Dispatch', path: base },
+    { key: 'trips', label: 'Trips', path: `${base}/trips` },
+    { key: 'drivers', label: 'Drivers', path: `${base}/drivers` },
+    { key: 'issues', label: 'Issues', path: `${base}/issues` },
+    { key: 'completed', label: 'Done', path: `${base}/completed` },
   ];
 
   return (

@@ -158,11 +158,12 @@ export function CaregiverView() {
   const greeting = now.getHours() < 12 ? 'Good morning' : now.getHours() < 17 ? 'Good afternoon' : 'Good evening';
   const dateStr = `${dayFull[now.getDay()]}, ${monthFull[now.getMonth()]} ${now.getDate()}`;
 
+  const base = isDemo ? '/demo/caregiver' : '/app/caregiver';
   const tabItems: { key: Tab; label: string; path: string }[] = [
-    { key: 'status', label: 'Status', path: '/app/caregiver' },
-    { key: 'alerts', label: 'Alerts', path: '/app/caregiver/alerts' },
-    { key: 'schedule', label: 'Schedule', path: '/app/caregiver/schedule' },
-    { key: 'help', label: 'Help', path: '/app/caregiver/help' },
+    { key: 'status', label: 'Status', path: base },
+    { key: 'alerts', label: 'Alerts', path: `${base}/alerts` },
+    { key: 'schedule', label: 'Schedule', path: `${base}/schedule` },
+    { key: 'help', label: 'Help', path: `${base}/help` },
   ];
 
   const unreadCount = alerts.filter(a => !a.read).length;
