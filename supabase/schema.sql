@@ -327,7 +327,6 @@ create index idx_rides_vendor    on rides (vendor_id);
 create index idx_rides_driver    on rides (driver_id)  where driver_id is not null;
 create index idx_rides_status    on rides (status);
 create index idx_rides_pickup    on rides (pickup_time);
-create index idx_rides_date      on rides (cast(pickup_time as date));
 
 
 -- ---------------------------------------------------------------------------
