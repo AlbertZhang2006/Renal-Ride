@@ -7,6 +7,7 @@ import { Modal } from '../components/Modal';
 import { RideDetail } from '../components/RideDetail';
 import { cn } from '../utils/cn';
 import { useNotifications } from '../data/NotificationContext';
+import { useRole } from '../data/RoleContext';
 import type { RideStatus } from '../types';
 
 const patient = patients[0];
@@ -69,7 +70,9 @@ const assistanceLabels: Record<string, string> = { independent: 'Independent', '
 export function PatientView() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { user } = useRole();
   const tab = tabFromPath(location.pathname);
+  const isDemo = location.pathname.startsWith('/demo');
 
   const { addNotification, addAuditLogEntry, addToast } = useNotifications();
   const [readyNotified, setReadyNotified] = useState(false);
@@ -181,7 +184,7 @@ export function PatientView() {
         <div className="space-y-5">
           {/* Greeting */}
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">{greeting}, {patient.firstName}</h1>
+            <h1 className="text-2xl font-bold text-gray-900">{greeting}, {isDemo ? patient.firstName : (user?.name?.split(' ')[0] ?? patient.firstName)}</h1>
             <p className="text-base text-gray-500 mt-1">{dateStr}</p>
           </div>
 

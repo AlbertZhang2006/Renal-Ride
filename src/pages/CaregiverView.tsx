@@ -7,6 +7,7 @@ import { Modal } from '../components/Modal';
 import { RideDetail } from '../components/RideDetail';
 import { cn } from '../utils/cn';
 import { useNotifications } from '../data/NotificationContext';
+import { useRole } from '../data/RoleContext';
 import type { RideStatus } from '../types';
 
 const caregiver = caregivers[0]; // Carlos Santos
@@ -126,7 +127,9 @@ const alertStyles: Record<Alert['type'], { bg: string; icon: string; iconBg: str
 export function CaregiverView() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { user } = useRole();
   const tab = tabFromPath(location.pathname);
+  const isDemo = location.pathname.startsWith('/demo');
 
   const { addNotification, addAuditLogEntry, addToast: addGlobalToast } = useNotifications();
   const [toasts, setToasts] = useState<Toast[]>([]);
@@ -253,7 +256,7 @@ export function CaregiverView() {
         <div className="space-y-5">
           {/* Greeting */}
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">{greeting}, {caregiver.name.split(' ')[0]}</h1>
+            <h1 className="text-2xl font-bold text-gray-900">{greeting}, {isDemo ? caregiver.name.split(' ')[0] : (user?.name?.split(' ')[0] ?? caregiver.name.split(' ')[0])}</h1>
             <p className="text-base text-gray-500 mt-1">{dateStr}</p>
           </div>
 
