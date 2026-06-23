@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import { useRole } from '../data/RoleContext';
 import { roleNavItems, roleLabels, roleColors } from '../data/roles';
 import { NavIcon } from '../components/NavIcon';
@@ -11,10 +11,15 @@ interface SidebarProps {
 
 export function Sidebar({ open, onClose }: SidebarProps) {
   const { role } = useRole();
+  const location = useLocation();
+  const isDemo = location.pathname.startsWith('/demo');
 
   if (!role) return null;
 
-  const navItems = roleNavItems[role];
+  const navItems = roleNavItems[role].map((item) => ({
+    ...item,
+    path: isDemo ? item.path.replace('/app', '/demo') : item.path,
+  }));
 
   const sidebar = (
     <aside className="flex flex-col w-56 bg-white border-r border-gray-200 shrink-0 h-full">

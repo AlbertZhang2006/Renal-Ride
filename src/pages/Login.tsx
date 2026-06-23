@@ -38,7 +38,7 @@ export function Login() {
 
   function handleSelect(role: UserRole) {
     setRole(role);
-    navigate(`/app/${role}`);
+    navigate(`/demo/${role}`);
   }
 
   return (
@@ -128,7 +128,12 @@ export function Login() {
         {/* Footer note */}
         <p className="mt-8 text-[11px] text-gray-400 text-center max-w-sm leading-relaxed">
           No account or password needed. Each role shows a pre-configured dashboard with
-          realistic dialysis transportation data.
+          sample dialysis transportation data.
+        </p>
+        <p className="mt-3 text-center">
+          <Link to="/login" className="text-xs text-brand-600 hover:text-brand-700 font-medium">
+            Have an account? Sign in &rarr;
+          </Link>
         </p>
       </div>
     </div>

@@ -44,6 +44,24 @@ export function RoleProvider({ children }: { children: ReactNode }) {
   );
 }
 
+export function AuthRoleProvider({
+  role,
+  user,
+  onLogout,
+  children,
+}: {
+  role: UserRole;
+  user: User;
+  onLogout: () => void;
+  children: ReactNode;
+}) {
+  return (
+    <RoleContext.Provider value={{ role, user, setRole: () => {}, logout: onLogout }}>
+      {children}
+    </RoleContext.Provider>
+  );
+}
+
 export function useRole(): RoleContextValue {
   const ctx = useContext(RoleContext);
   if (!ctx) throw new Error('useRole must be used within RoleProvider');

@@ -1,11 +1,26 @@
 export type UserRole = 'patient' | 'caregiver' | 'clinic' | 'vendor' | 'admin';
 
+export type ApprovalStatus = 'pending' | 'approved' | 'denied';
+
 export interface User {
   id: string;
   name: string;
   email: string;
   role: UserRole;
   avatar?: string;
+}
+
+// Matches the profiles table after running supabase/migration_auth.sql
+export interface UserProfile {
+  id: string;
+  full_name: string;
+  email: string;
+  avatar_url: string | null;
+  role: string;
+  organization_name: string | null;
+  approval_status: ApprovalStatus;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface NavItem {

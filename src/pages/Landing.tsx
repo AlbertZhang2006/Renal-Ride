@@ -137,8 +137,8 @@ export function Landing() {
             <Link to="/login">
               <Button variant="ghost" size="sm">Sign In</Button>
             </Link>
-            <Link to="/app/clinic">
-              <Button size="sm">View Demo Dashboard</Button>
+            <Link to="/demo">
+              <Button size="sm">Try Demo</Button>
             </Link>
           </div>
         </div>
@@ -167,19 +167,19 @@ export function Landing() {
               treatment, and keep caregivers informed.
             </p>
             <div className="flex flex-wrap items-center gap-3 mt-8">
-              <Link to="/app/clinic">
-                <Button size="lg">View Demo Dashboard</Button>
+              <Link to="/demo">
+                <Button size="lg">Try Interactive Demo</Button>
               </Link>
-              <a href="#features">
-                <Button variant="outline" size="lg">Learn More</Button>
-              </a>
+              <Link to="/login">
+                <Button variant="outline" size="lg">Sign In</Button>
+              </Link>
             </div>
             <div className="flex items-center gap-4 mt-6 text-[11px] text-gray-400">
               <span className="flex items-center gap-1.5">
                 <svg className="w-3.5 h-3.5 text-emerald-500" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                 </svg>
-                No sign-up required
+                Demo uses sample data
               </span>
               <span className="flex items-center gap-1.5">
                 <svg className="w-3.5 h-3.5 text-emerald-500" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
@@ -187,12 +187,9 @@ export function Landing() {
                 </svg>
                 5 role demos
               </span>
-              <span className="flex items-center gap-1.5">
-                <svg className="w-3.5 h-3.5 text-emerald-500" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-                </svg>
-                Realistic data
-              </span>
+              <Link to="/request-demo" className="text-brand-600 hover:text-brand-700 font-medium text-[11px]">
+                Request Clinic Access &rarr;
+              </Link>
             </div>
           </div>
 
@@ -594,13 +591,13 @@ export function Landing() {
             See Renal Ride in action
           </h2>
           <p className="text-sm text-brand-200 mt-2 max-w-lg mx-auto leading-relaxed">
-            Explore the interactive demo dashboard with realistic patient data,
-            ride schedules, and risk tracking &mdash; no sign-up required.
+            Explore the interactive demo with sample data, or sign in to manage
+            real dialysis transportation.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-3 mt-8">
-            <Link to="/app/clinic">
+            <Link to="/demo">
               <button className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-white text-brand-700 text-sm font-semibold hover:bg-brand-50 transition-colors cursor-pointer">
-                View Demo Dashboard
+                Try Interactive Demo
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
                 </svg>
@@ -608,8 +605,13 @@ export function Landing() {
             </Link>
             <Link to="/login">
               <button className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-brand-500/30 text-white text-sm font-medium hover:bg-brand-500/40 transition-colors cursor-pointer border border-brand-400/30">
-                Choose a Role
+                Sign In
               </button>
+            </Link>
+          </div>
+          <div className="mt-4 text-center">
+            <Link to="/request-demo" className="text-sm text-brand-200 hover:text-white transition-colors">
+              Request clinic access &rarr;
             </Link>
           </div>
         </div>

@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useRole } from '../data/RoleContext';
 import { RoleSwitcher } from '../components/RoleSwitcher';
 import { NotificationBell } from '../components/NotificationBell';
@@ -10,12 +10,14 @@ interface HeaderProps {
 export function Header({ onMenuToggle }: HeaderProps) {
   const { user, logout } = useRole();
   const navigate = useNavigate();
+  const location = useLocation();
+  const isDemo = location.pathname.startsWith('/demo');
 
   if (!user) return null;
 
   function handleLogout() {
     logout();
-    navigate('/login');
+    navigate(isDemo ? '/demo' : '/');
   }
 
   return (
@@ -41,13 +43,15 @@ export function Header({ onMenuToggle }: HeaderProps) {
       </div>
 
       <div className="flex items-center gap-3">
-        <span className="hidden sm:inline-flex items-center rounded-md bg-amber-50 px-2 py-0.5 text-[11px] font-medium text-amber-700 border border-amber-200/60">
-          Demo Mode
-        </span>
+        {isDemo && (
+          <span className="hidden sm:inline-flex items-center rounded-md bg-amber-50 px-2 py-0.5 text-[11px] font-medium text-amber-700 border border-amber-200/60">
+            Demo Mode
+          </span>
+        )}
 
         <NotificationBell />
 
-        <RoleSwitcher />
+        {isDemo && <RoleSwitcher />}
 
         <div className="h-5 w-px bg-gray-200 hidden sm:block" />
 

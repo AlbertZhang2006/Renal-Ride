@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useRole } from '../data/RoleContext';
 import { roleLabels, roleDescriptions, roleColors } from '../data/roles';
 import type { UserRole } from '../types';
@@ -12,6 +12,8 @@ export function RoleSwitcher() {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+  const location = useLocation();
+  const isDemo = location.pathname.startsWith('/demo');
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {
@@ -25,7 +27,7 @@ export function RoleSwitcher() {
 
   function handleSelect(r: UserRole) {
     setRole(r);
-    navigate(`/app/${r}`);
+    navigate(isDemo ? `/demo/${r}` : `/app/${r}`);
     setOpen(false);
   }
 

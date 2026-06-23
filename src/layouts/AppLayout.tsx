@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Outlet, Navigate } from 'react-router-dom';
+import { Outlet, Navigate, useLocation } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
 import { useRole } from '../data/RoleContext';
@@ -10,11 +10,20 @@ export function AppLayout() {
   const { role } = useRole();
   const { toasts } = useNotifications();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const location = useLocation();
+  const isDemo = location.pathname.startsWith('/demo');
 
-  if (!role) return <Navigate to="/login" replace />;
+  if (!role) return <Navigate to={isDemo ? '/demo' : '/login'} replace />;
 
   return (
     <div className="flex flex-col h-screen bg-gray-50/50">
+      {isDemo && (
+        <div className="bg-amber-50 border-b border-amber-200/60 px-4 py-1.5 text-center shrink-0">
+          <p className="text-[11px] text-amber-700">
+            <span className="font-semibold">Prototype Demo</span> — Sample data only. Not for real patient information. HIPAA/security review required before production use.
+          </p>
+        </div>
+      )}
       <Header onMenuToggle={() => setSidebarOpen(!sidebarOpen)} />
       <div className="flex flex-1 min-h-0">
         <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
