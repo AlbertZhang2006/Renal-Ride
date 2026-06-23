@@ -114,13 +114,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           emailRedirectTo: `${window.location.origin}/login`,
         },
       });
-      if (error) return { error: { message: extractErrorMessage(error, 'Sign up failed. Please try again.') } };
+      if (error) {
+        console.error('[Renal Ride] signUp error:', JSON.stringify(error, null, 2));
+        return { error: { message: extractErrorMessage(error, 'Sign up failed. Please try again.') } };
+      }
       // Supabase returns a user with no identities if email already exists (to prevent enumeration)
       if (data.user && data.user.identities && data.user.identities.length === 0) {
         return { error: { message: 'An account with this email may already exist. Try signing in instead.' } };
       }
       return { error: null };
     } catch (err) {
+      console.error('[Renal Ride] signUp exception:', err);
       return { error: { message: extractErrorMessage(err, 'Sign up failed. Please try again.') } };
     }
   }
