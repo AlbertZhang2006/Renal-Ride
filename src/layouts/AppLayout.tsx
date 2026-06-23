@@ -27,8 +27,8 @@ export function AppLayout() {
       <Header onMenuToggle={() => setSidebarOpen(!sidebarOpen)} />
       <div className="flex flex-1 min-h-0">
         <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-        <main className="flex-1 overflow-y-auto">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <main className="flex-1 overflow-y-auto" style={{ background: '#fafafa' }}>
+          <div style={{ maxWidth: 1240, margin: '0 auto', padding: '30px 36px 64px' }}>
             <Outlet />
           </div>
         </main>

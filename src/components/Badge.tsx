@@ -1,31 +1,34 @@
-import { cn } from '../utils/cn';
-
-type BadgeVariant = 'neutral' | 'success' | 'warning' | 'danger' | 'low' | 'medium' | 'high';
-
 interface BadgeProps {
+  variant?: 'low' | 'medium' | 'high' | 'neutral' | 'success' | 'warning' | 'danger';
   children: React.ReactNode;
-  variant?: BadgeVariant;
   className?: string;
 }
 
-const variantStyles: Record<BadgeVariant, string> = {
-  neutral:  'bg-gray-100 text-gray-600',
-  success:  'bg-emerald-50 text-emerald-700',
-  warning:  'bg-amber-50 text-amber-700',
-  danger:   'bg-red-50 text-red-700',
-  low:      'bg-sky-50 text-sky-700',
-  medium:   'bg-amber-50 text-amber-700',
-  high:     'bg-red-50 text-red-700',
+const variantStyles: Record<string, { bg: string; text: string }> = {
+  low:     { bg: '#f4f4f5', text: '#737373' },
+  medium:  { bg: '#fff7ed', text: '#b45309' },
+  high:    { bg: '#fef2f2', text: '#b91c1c' },
+  neutral: { bg: '#f4f4f5', text: '#737373' },
+  success: { bg: '#ecfdf5', text: '#047857' },
+  warning: { bg: '#fff7ed', text: '#b45309' },
+  danger:  { bg: '#fef2f2', text: '#b91c1c' },
 };
 
-export function Badge({ children, variant = 'neutral', className }: BadgeProps) {
+export function Badge({ variant = 'neutral', children, className }: BadgeProps) {
+  const s = variantStyles[variant] || variantStyles.neutral;
   return (
     <span
-      className={cn(
-        'inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium',
-        variantStyles[variant],
-        className,
-      )}
+      className={className}
+      style={{
+        display: 'inline-flex',
+        padding: '2px 8px',
+        borderRadius: 6,
+        fontSize: 11,
+        fontWeight: 500,
+        background: s.bg,
+        color: s.text,
+        whiteSpace: 'nowrap',
+      }}
     >
       {children}
     </span>

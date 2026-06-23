@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { rides, patients, vendors, clinic } from '../data/mock';
-import { PageHeader } from '../components/PageHeader';
 import { StatusPill } from '../components/StatusPill';
 import { Badge } from '../components/Badge';
 import { Button } from '../components/Button';
@@ -333,68 +332,38 @@ export function ClinicDashboard() {
 
   const closeModal = useCallback(() => setModalState(null), []);
 
-  const { stats, completedPct, completedCount, totalRides } = useClinicStats();
+  const { stats } = useClinicStats();
 
   return (
     <div>
-      <PageHeader
-        title="Clinic Command Center"
-        subtitle="Monitor today's dialysis rides, identify at-risk patients, and coordinate return transportation."
-        action={
-          <div className="flex items-center gap-2.5">
-            <span className="relative flex h-2.5 w-2.5">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" />
-            </span>
-            <span className="text-xs font-medium text-gray-500">
-              Live &middot; {new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}
-            </span>
-          </div>
-        }
-      />
-
-      {/* Daily progress + summary cards */}
-      <div className="flex items-center gap-4 p-4 rounded-xl bg-white border border-gray-200 mb-4">
-        <div className="relative w-16 h-16 shrink-0">
-          <svg className="w-16 h-16 -rotate-90" viewBox="0 0 36 36">
-            <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#e5e7eb" strokeWidth="3" />
-            <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#10b981" strokeWidth="3" strokeDasharray={`${completedPct}, 100`} strokeLinecap="round" />
-          </svg>
-          <span className="absolute inset-0 flex items-center justify-center text-sm font-bold text-gray-900">{completedPct}%</span>
-        </div>
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-gray-900">Daily Completion</p>
-          <p className="text-xs text-gray-500 mt-0.5">{completedCount} of {totalRides} rides completed today</p>
-          <div className="w-full h-1.5 bg-gray-100 rounded-full mt-2 overflow-hidden">
-            <div className="h-full bg-emerald-500 rounded-full transition-all" style={{ width: `${completedPct}%` }} />
-          </div>
-        </div>
-        <div className="hidden sm:flex items-center gap-4 shrink-0 text-center">
-          <div>
-            <p className="text-lg font-bold text-emerald-600">{completedCount}</p>
-            <p className="text-[11px] text-gray-400">Done</p>
-          </div>
-          <div className="w-px h-8 bg-gray-200" />
-          <div>
-            <p className="text-lg font-bold text-brand-600">{totalRides - completedCount}</p>
-            <p className="text-[11px] text-gray-400">Remaining</p>
-          </div>
+      <div className="flex items-start justify-between mb-6">
+        <div>
+          <h1 style={{ fontSize: 23, fontWeight: 600, letterSpacing: '-0.02em', margin: 0 }}>Command Center</h1>
+          <p style={{ margin: '6px 0 0', fontSize: 14, color: '#666', maxWidth: 560, lineHeight: 1.5 }}>
+            Every dialysis ride today — who's been picked up, who's in treatment, who's at risk of missing care, and who's waiting to go home.
+          </p>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2.5 mb-6">
+      {/* KPI Row */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3 mb-4">
         {stats.map((s) => (
-          <div key={s.label} className={cn(
-            'rounded-xl border px-3.5 py-3',
-            s.accent ? 'bg-red-50/60 border-red-200' : 'bg-white border-gray-200',
-          )}>
-            <div className="flex items-center justify-between mb-1">
-              <p className="text-[11px] text-gray-500 truncate">{s.label}</p>
-              <svg className={cn('w-3.5 h-3.5 shrink-0', s.accent ? 'text-red-400' : 'text-gray-300')} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+          <div
+            key={s.label}
+            style={{
+              background: s.accent ? '#fffafa' : '#fff',
+              border: s.accent ? '1px solid #f6dcdc' : '1px solid #eaeaea',
+              borderRadius: 12,
+              padding: '14px 16px',
+            }}
+          >
+            <div className="flex items-center justify-between" style={{ marginBottom: 4 }}>
+              <p style={{ fontSize: 12, color: '#737373', fontWeight: 500, margin: 0 }}>{s.label}</p>
+              <svg style={{ width: 15, height: 15, color: s.accent ? '#dc2626' : '#c9c9c9' }} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                 {s.icon}
               </svg>
             </div>
-            <p className={cn('text-lg font-semibold', s.accent ? 'text-red-600' : 'text-gray-900')}>
+            <p style={{ fontSize: 26, fontWeight: 600, letterSpacing: '-0.02em', fontFamily: "'Geist Mono', monospace", color: s.accent ? '#b91c1c' : '#171717', margin: 0 }}>
               {s.value}
             </p>
           </div>
@@ -402,29 +371,40 @@ export function ClinicDashboard() {
       </div>
 
       {/* Transportation board */}
-      <div className="bg-white rounded-xl border border-gray-200">
+      <div style={{ background: '#fff', border: '1px solid #eaeaea', borderRadius: 12, overflow: 'hidden' }}>
         {/* Filters header */}
-        <div className="px-4 sm:px-5 py-3 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <h2 className="text-sm font-semibold text-gray-900">Today's Transportation Board</h2>
-          <div className="flex flex-wrap gap-1.5">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3" style={{ padding: '14px 18px', borderBottom: '1px solid #f0f0f0' }}>
+          <h2 style={{ fontSize: 14, fontWeight: 600, margin: 0 }}>Transportation Board</h2>
+          <div className="flex flex-wrap" style={{ gap: 6 }}>
             {filters.map((f) => {
               const count = filterCount(f.key);
+              const isActive = filter === f.key;
               return (
                 <button
                   key={f.key}
                   onClick={() => setFilter(f.key)}
-                  className={cn(
-                    'inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors cursor-pointer',
-                    filter === f.key
-                      ? 'bg-gray-900 text-white'
-                      : 'bg-gray-50 text-gray-600 hover:bg-gray-100',
-                  )}
+                  className="inline-flex items-center cursor-pointer"
+                  style={{
+                    height: 28,
+                    padding: '0 10px',
+                    borderRadius: 7,
+                    border: 'none',
+                    background: isActive ? '#171717' : '#f4f4f5',
+                    color: isActive ? '#fff' : '#666',
+                    fontSize: 12,
+                    fontWeight: 500,
+                    fontFamily: 'inherit',
+                    gap: 5,
+                  }}
                 >
                   {f.label}
-                  <span className={cn(
-                    'text-[10px] rounded-full px-1.5 py-px',
-                    filter === f.key ? 'bg-white/20 text-white' : 'bg-gray-200/70 text-gray-500',
-                  )}>
+                  <span style={{
+                    fontSize: 10,
+                    padding: '1px 6px',
+                    borderRadius: 999,
+                    background: isActive ? 'rgba(255,255,255,.2)' : '#e4e4e7',
+                    color: isActive ? '#fff' : '#737373',
+                  }}>
                     {count}
                   </span>
                 </button>
@@ -435,18 +415,18 @@ export function ClinicDashboard() {
 
         {/* Table */}
         <div className="overflow-x-auto">
-          <table className="w-full text-xs">
+          <table className="w-full" style={{ fontSize: 13, borderCollapse: 'collapse' }}>
             <thead>
-              <tr className="border-b border-gray-100">
-                <th className="text-left font-medium text-gray-500 pl-4 sm:pl-5 pr-3 py-2.5">Patient</th>
-                <th className="text-left font-medium text-gray-500 px-3 py-2.5 hidden lg:table-cell">Chair Time</th>
-                <th className="text-left font-medium text-gray-500 px-3 py-2.5">Pickup</th>
-                <th className="text-left font-medium text-gray-500 px-3 py-2.5 hidden sm:table-cell">Direction</th>
-                <th className="text-left font-medium text-gray-500 px-3 py-2.5">Status</th>
-                <th className="text-left font-medium text-gray-500 px-3 py-2.5 hidden md:table-cell">Risk</th>
-                <th className="text-left font-medium text-gray-500 px-3 py-2.5 hidden xl:table-cell">Vendor</th>
-                <th className="text-left font-medium text-gray-500 px-3 py-2.5 hidden xl:table-cell">Assistance</th>
-                <th className="text-right font-medium text-gray-500 pl-3 pr-4 sm:pr-5 py-2.5 w-12">Action</th>
+              <tr style={{ borderBottom: '1px solid #f0f0f0' }}>
+                <th style={{ textAlign: 'left', fontSize: 11, fontWeight: 500, color: '#a3a3a3', padding: '9px 12px 9px 18px', letterSpacing: '0.03em' }}>PATIENT</th>
+                <th className="hidden lg:table-cell" style={{ textAlign: 'left', fontSize: 11, fontWeight: 500, color: '#a3a3a3', padding: '9px 12px', letterSpacing: '0.03em' }}>CHAIR</th>
+                <th style={{ textAlign: 'left', fontSize: 11, fontWeight: 500, color: '#a3a3a3', padding: '9px 12px', letterSpacing: '0.03em' }}>PICKUP</th>
+                <th className="hidden sm:table-cell" style={{ textAlign: 'left', fontSize: 11, fontWeight: 500, color: '#a3a3a3', padding: '9px 12px', letterSpacing: '0.03em' }}>DIR</th>
+                <th style={{ textAlign: 'left', fontSize: 11, fontWeight: 500, color: '#a3a3a3', padding: '9px 12px', letterSpacing: '0.03em' }}>STATUS</th>
+                <th className="hidden md:table-cell" style={{ textAlign: 'left', fontSize: 11, fontWeight: 500, color: '#a3a3a3', padding: '9px 12px', letterSpacing: '0.03em' }}>RISK</th>
+                <th className="hidden xl:table-cell" style={{ textAlign: 'left', fontSize: 11, fontWeight: 500, color: '#a3a3a3', padding: '9px 12px', letterSpacing: '0.03em' }}>VENDOR</th>
+                <th className="hidden xl:table-cell" style={{ textAlign: 'left', fontSize: 11, fontWeight: 500, color: '#a3a3a3', padding: '9px 12px', letterSpacing: '0.03em' }}>ASSIST</th>
+                <th style={{ textAlign: 'right', fontSize: 11, fontWeight: 500, color: '#a3a3a3', padding: '9px 18px 9px 12px', letterSpacing: '0.03em', width: 60 }}></th>
               </tr>
             </thead>
             <tbody>
@@ -467,22 +447,22 @@ export function ClinicDashboard() {
                 return (
                   <tr
                     key={ride.id}
-                    className={cn(
-                      'border-b border-gray-50 last:border-0 transition-colors hover:bg-gray-50/60',
-                      isUrgent && 'bg-red-50/40',
-                    )}
+                    style={{
+                      borderBottom: '1px solid #f4f4f4',
+                      background: isUrgent ? '#fef9f9' : undefined,
+                    }}
                   >
                     {/* Patient */}
-                    <td className="pl-4 sm:pl-5 pr-3 py-2.5">
-                      <div className="flex items-center gap-2.5">
-                        <div className="h-7 w-7 rounded-full bg-gray-100 flex items-center justify-center text-[10px] font-semibold text-gray-500 shrink-0">
+                    <td style={{ padding: '11px 12px 11px 18px' }}>
+                      <div className="flex items-center" style={{ gap: 10 }}>
+                        <div className="flex items-center justify-center shrink-0" style={{ height: 28, width: 28, borderRadius: 999, background: '#f3f3f3', fontSize: 10, fontWeight: 600, color: '#666' }}>
                           {patient ? `${patient.firstName[0]}${patient.lastName[0]}` : '?'}
                         </div>
                         <div className="min-w-0">
-                          <p className="text-xs font-medium text-gray-900 truncate">
+                          <p style={{ fontSize: 13, fontWeight: 500, color: '#262626', margin: 0 }} className="truncate">
                             {patient ? getPatientName(patient) : 'Unknown'}
                           </p>
-                          <p className="text-[11px] text-gray-400 sm:hidden">
+                          <p className="sm:hidden" style={{ fontSize: 11, color: '#a3a3a3', margin: 0 }}>
                             {ride.direction === 'to-clinic' ? 'To clinic' : 'Return'}
                           </p>
                         </div>
@@ -490,13 +470,13 @@ export function ClinicDashboard() {
                     </td>
 
                     {/* Chair time */}
-                    <td className="px-3 py-2.5 text-gray-600 hidden lg:table-cell whitespace-nowrap">
+                    <td className="hidden lg:table-cell" style={{ padding: '11px 12px', color: '#525252', fontFamily: "'Geist Mono', monospace", fontSize: 12, whiteSpace: 'nowrap' }}>
                       {formatTime(ride.chairTime)}
                     </td>
 
                     {/* Pickup time */}
-                    <td className="px-3 py-2.5 whitespace-nowrap">
-                      <span className="text-gray-900">{formatTime(ride.pickupTime)}</span>
+                    <td style={{ padding: '11px 12px', whiteSpace: 'nowrap' }}>
+                      <span style={{ color: '#262626', fontFamily: "'Geist Mono', monospace", fontSize: 12 }}>{formatTime(ride.pickupTime)}</span>
                       {ride.actualPickupTime && (
                         <span className="text-[10px] text-gray-400 ml-1">
                           (actual {formatTime(ride.actualPickupTime)})

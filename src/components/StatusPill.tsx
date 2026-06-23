@@ -1,4 +1,3 @@
-import { cn } from '../utils/cn';
 import type { RideStatus } from '../types';
 import { getRideStatusLabel } from '../utils/helpers';
 
@@ -7,49 +6,46 @@ interface StatusPillProps {
   className?: string;
 }
 
-type StatusCategory = 'info' | 'active' | 'success' | 'warning' | 'danger' | 'neutral';
-
-const statusCategory: Record<RideStatus, StatusCategory> = {
-  scheduled: 'info',
-  driver_assigned: 'info',
-  driver_en_route: 'active',
-  driver_arrived: 'active',
-  picked_up: 'active',
-  arrived_at_clinic: 'active',
-  in_treatment: 'active',
-  ready_for_return: 'warning',
-  return_assigned: 'info',
-  returning_home: 'active',
-  arrived_home: 'success',
-  completed: 'success',
-  delayed: 'warning',
-  missed: 'danger',
-  canceled: 'neutral',
-  issue_reported: 'danger',
+const statusStyles: Record<string, { bg: string; text: string; dot: string }> = {
+  scheduled:        { bg: '#eef4ff', text: '#3056b3', dot: '#3b6fe0' },
+  driver_assigned:  { bg: '#eef4ff', text: '#3056b3', dot: '#3b6fe0' },
+  driver_en_route:  { bg: '#ecf4f7', text: '#0e6a82', dot: '#0e7490' },
+  driver_arrived:   { bg: '#ecf4f7', text: '#0e6a82', dot: '#0e7490' },
+  picked_up:        { bg: '#ecf4f7', text: '#0e6a82', dot: '#0e7490' },
+  arrived_at_clinic:{ bg: '#ecf4f7', text: '#0e6a82', dot: '#0e7490' },
+  in_treatment:     { bg: '#ecf4f7', text: '#0e6a82', dot: '#0e7490' },
+  ready_for_return: { bg: '#fff7ed', text: '#b45309', dot: '#ea9006' },
+  return_assigned:  { bg: '#eef4ff', text: '#3056b3', dot: '#3b6fe0' },
+  returning_home:   { bg: '#ecf4f7', text: '#0e6a82', dot: '#0e7490' },
+  arrived_home:     { bg: '#ecfdf5', text: '#047857', dot: '#10b981' },
+  completed:        { bg: '#ecfdf5', text: '#047857', dot: '#10b981' },
+  delayed:          { bg: '#fef2f2', text: '#b91c1c', dot: '#dc2626' },
+  missed:           { bg: '#fef2f2', text: '#b91c1c', dot: '#dc2626' },
+  canceled:         { bg: '#f4f4f5', text: '#737373', dot: '#a3a3a3' },
+  issue_reported:   { bg: '#fef2f2', text: '#b91c1c', dot: '#dc2626' },
 };
 
-const categoryStyles: Record<StatusCategory, { dot: string; bg: string; text: string }> = {
-  info:    { dot: 'bg-blue-500',    bg: 'bg-blue-50',    text: 'text-blue-700' },
-  active:  { dot: 'bg-brand-500',   bg: 'bg-brand-50',   text: 'text-brand-700' },
-  success: { dot: 'bg-emerald-500', bg: 'bg-emerald-50', text: 'text-emerald-700' },
-  warning: { dot: 'bg-amber-500',   bg: 'bg-amber-50',   text: 'text-amber-700' },
-  danger:  { dot: 'bg-red-500',     bg: 'bg-red-50',     text: 'text-red-700' },
-  neutral: { dot: 'bg-gray-400',    bg: 'bg-gray-50',    text: 'text-gray-600' },
-};
+const fallback = { bg: '#f4f4f5', text: '#737373', dot: '#a3a3a3' };
 
 export function StatusPill({ status, className }: StatusPillProps) {
-  const cat = statusCategory[status];
-  const c = categoryStyles[cat];
+  const s = statusStyles[status] || fallback;
   return (
     <span
-      className={cn(
-        'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium whitespace-nowrap',
-        c.bg,
-        c.text,
-        className,
-      )}
+      className={className}
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 6,
+        padding: '3px 9px',
+        borderRadius: 999,
+        fontSize: 12,
+        fontWeight: 500,
+        whiteSpace: 'nowrap',
+        background: s.bg,
+        color: s.text,
+      }}
     >
-      <span className={cn('h-1.5 w-1.5 rounded-full', c.dot)} />
+      <span style={{ height: 6, width: 6, borderRadius: 999, background: s.dot, flexShrink: 0 }} />
       {getRideStatusLabel(status)}
     </span>
   );

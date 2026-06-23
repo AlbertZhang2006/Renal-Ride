@@ -1,644 +1,218 @@
 import { Link } from 'react-router-dom';
-import { Button } from '../components/Button';
 import { StatusPill } from '../components/StatusPill';
 import { Badge } from '../components/Badge';
 import type { RideStatus } from '../types';
 
-// ---------------------------------------------------------------------------
-// Tiny inline preview components — these render fake "dashboard cards" that
-// give the landing page a product-preview feel without importing real pages.
-// ---------------------------------------------------------------------------
-
-function PreviewCard({ children, className = '' }: { children: React.ReactNode; className?: string }) {
-  return (
-    <div className={`bg-white rounded-xl border border-gray-200 p-4 sm:p-5 ${className}`}>
-      {children}
-    </div>
-  );
-}
-
-function PreviewLabel({ children }: { children: React.ReactNode }) {
-  return <p className="text-[11px] font-medium text-gray-400 uppercase tracking-wider mb-3">{children}</p>;
-}
-
-// ---------------------------------------------------------------------------
-// Section wrapper
-// ---------------------------------------------------------------------------
-
-function Section({
-  id,
-  children,
-  className = '',
-}: {
-  id?: string;
-  children: React.ReactNode;
-  className?: string;
-}) {
-  return (
-    <section id={id} className={`max-w-5xl mx-auto px-6 py-16 sm:py-24 ${className}`}>
-      {children}
-    </section>
-  );
-}
-
-function SectionLabel({ children }: { children: React.ReactNode }) {
-  return (
-    <p className="text-[11px] font-semibold text-brand-600 uppercase tracking-widest mb-3">{children}</p>
-  );
-}
-
-function SectionTitle({ children }: { children: React.ReactNode }) {
-  return (
-    <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 tracking-tight">{children}</h2>
-  );
-}
-
-function SectionDesc({ children }: { children: React.ReactNode }) {
-  return (
-    <p className="text-sm sm:text-base text-gray-500 mt-2 max-w-2xl leading-relaxed">{children}</p>
-  );
-}
-
-function Divider() {
-  return (
-    <div className="max-w-5xl mx-auto px-6">
-      <div className="border-t border-gray-100" />
-    </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Hero dashboard preview — a simplified "command center" card
-// ---------------------------------------------------------------------------
-
 function HeroDashboardPreview() {
-  const rows: { name: string; time: string; status: RideStatus; risk: 'low' | 'medium' | 'high' }[] = [
-    { name: 'M. Santos', time: '5:15 AM', status: 'in_treatment', risk: 'high' },
-    { name: 'R. Johnson', time: '5:20 AM', status: 'in_treatment', risk: 'low' },
-    { name: 'D. Williams', time: '9:10 AM', status: 'driver_en_route', risk: 'medium' },
-    { name: 'L. Martinez', time: '9:15 AM', status: 'delayed', risk: 'medium' },
-    { name: 'W. Davis', time: '1:10 PM', status: 'scheduled', risk: 'high' },
+  const rows: { name: string; initials: string; time: string; status: RideStatus; risk: 'low' | 'medium' | 'high' }[] = [
+    { name: 'M. Santos', initials: 'MS', time: '5:15 AM', status: 'in_treatment', risk: 'high' },
+    { name: 'R. Johnson', initials: 'RJ', time: '5:20 AM', status: 'in_treatment', risk: 'low' },
+    { name: 'D. Williams', initials: 'DW', time: '9:10 AM', status: 'driver_en_route', risk: 'medium' },
+    { name: 'L. Martinez', initials: 'LM', time: '9:15 AM', status: 'delayed', risk: 'medium' },
+    { name: 'W. Davis', initials: 'WD', time: '1:10 PM', status: 'scheduled', risk: 'high' },
   ];
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-      {/* Title bar */}
-      <div className="px-4 sm:px-5 py-3 border-b border-gray-100 flex items-center justify-between">
+    <div style={{ background: '#fff', borderRadius: 14, border: '1px solid #eaeaea', boxShadow: '0 16px 44px rgba(0,0,0,.08)', overflow: 'hidden' }}>
+      <div className="flex items-center justify-between" style={{ padding: '13px 16px', borderBottom: '1px solid #f0f0f0' }}>
         <div className="flex items-center gap-2">
-          <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+          <span className="relative flex" style={{ height: 8, width: 8 }}>
+            <span className="absolute inset-0 rounded-full" style={{ background: '#34d399', opacity: 0.65, animation: 'rr-ping 1.8s cubic-bezier(0,0,.2,1) infinite' }} />
+            <span className="relative inline-flex rounded-full" style={{ height: 8, width: 8, background: '#10b981' }} />
           </span>
-          <span className="text-xs font-semibold text-gray-700">Today's Rides</span>
+          <span style={{ fontSize: 13, fontWeight: 600 }}>Today's Rides</span>
         </div>
-        <span className="text-[11px] text-gray-400">12 rides &middot; Live</span>
+        <span style={{ fontSize: 11, color: '#a3a3a3', fontFamily: "'Geist Mono', monospace" }}>8 rides · Live</span>
       </div>
-      {/* Rows */}
-      <div className="divide-y divide-gray-50">
-        {rows.map((r) => (
-          <div key={r.name} className="px-4 sm:px-5 py-2.5 flex items-center gap-3">
-            <div className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-[10px] font-semibold text-gray-500 shrink-0">
-              {r.name.split('.')[0]}
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-xs font-medium text-gray-800 truncate">{r.name}</p>
-              <p className="text-[11px] text-gray-400">{r.time}</p>
-            </div>
-            <Badge variant={r.risk} className="hidden sm:inline-flex">{r.risk}</Badge>
-            <StatusPill status={r.status} className="text-[10px] px-2 py-0.5" />
+      {rows.map((r) => (
+        <div key={r.name + r.time} className="flex items-center gap-3" style={{ padding: '11px 16px', borderBottom: '1px solid #f6f6f6' }}>
+          <div className="flex items-center justify-center shrink-0" style={{ height: 28, width: 28, borderRadius: 999, background: '#f3f3f3', fontSize: 10, fontWeight: 600, color: '#666' }}>
+            {r.initials}
           </div>
-        ))}
-      </div>
+          <div className="flex-1 min-w-0">
+            <p style={{ fontSize: 13, fontWeight: 500, color: '#262626', margin: 0 }}>{r.name}</p>
+            <p style={{ fontSize: 11, color: '#a3a3a3', margin: 0 }}>{r.time}</p>
+          </div>
+          <Badge variant={r.risk} className="hidden sm:inline-flex">{r.risk === 'medium' ? 'Med' : r.risk.charAt(0).toUpperCase() + r.risk.slice(1)}</Badge>
+          <StatusPill status={r.status} />
+        </div>
+      ))}
     </div>
   );
 }
 
-// ===========================================================================
-// Landing Page
-// ===========================================================================
+const features = [
+  {
+    title: 'Command Center',
+    desc: 'See every patient\'s ride status in real time — who\'s en route, in treatment, delayed, or waiting for a return.',
+    icon: (
+      <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25a2.25 2.25 0 0 1-2.25-2.25v-2.25Z" />
+    ),
+  },
+  {
+    title: 'Risk Queue',
+    desc: 'Surfaces at-risk rides with clinical reasoning — late drivers, missing vehicles, high-risk patients — before they become emergencies.',
+    icon: (
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+    ),
+  },
+  {
+    title: 'Return Ride Manager',
+    desc: 'One-tap return dispatch when treatment ends. Supports scheduled pickups, will-call, and clinic-triggered returns.',
+    icon: (
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" />
+    ),
+  },
+];
 
 export function Landing() {
   return (
-    <div className="min-h-screen bg-white">
-      {/* ----------------------------------------------------------------- */}
-      {/* Nav                                                                */}
-      {/* ----------------------------------------------------------------- */}
-      <header className="sticky top-0 z-30 bg-white/90 backdrop-blur-sm border-b border-gray-100">
-        <div className="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between">
+    <div style={{ minHeight: '100vh', background: '#fff' }}>
+      {/* Nav */}
+      <header className="sticky top-0 z-30" style={{ background: 'rgba(255,255,255,.86)', backdropFilter: 'blur(10px)', borderBottom: '1px solid #f0f0f0' }}>
+        <div className="flex items-center justify-between" style={{ maxWidth: 1080, margin: '0 auto', padding: '0 28px', height: 60 }}>
           <div className="flex items-center gap-2">
-            <div className="h-7 w-7 rounded-lg bg-brand-600 flex items-center justify-center">
-              <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+            <div className="flex items-center justify-center" style={{ height: 30, width: 30, borderRadius: 8, background: '#0e7490' }}>
+              <svg style={{ width: 16, height: 16 }} className="text-white" fill="none" viewBox="0 0 24 24" strokeWidth={2.2} stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
               </svg>
             </div>
-            <span className="text-sm font-semibold text-gray-900">Renal Ride</span>
+            <span style={{ fontSize: 15, fontWeight: 600, letterSpacing: '-0.01em' }}>Renal Ride</span>
           </div>
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-2">
             <Link to="/login">
-              <Button variant="ghost" size="sm">Sign In</Button>
+              <button className="cursor-pointer" style={{ height: 36, padding: '0 14px', border: 'none', background: 'none', color: '#525252', fontSize: 13, fontWeight: 500, fontFamily: 'inherit' }}>
+                Sign in
+              </button>
             </Link>
             <Link to="/demo">
-              <Button size="sm">Try Demo</Button>
+              <button className="cursor-pointer" style={{ height: 36, padding: '0 16px', borderRadius: 8, border: 'none', background: '#0e7490', color: '#fff', fontSize: 13, fontWeight: 500, fontFamily: 'inherit' }}>
+                Try demo
+              </button>
             </Link>
           </div>
         </div>
       </header>
 
-      {/* ----------------------------------------------------------------- */}
-      {/* Hero                                                               */}
-      {/* ----------------------------------------------------------------- */}
-      <Section className="!pt-14 sm:!pt-20 !pb-12 sm:!pb-16">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 items-center">
-          {/* Copy */}
+      {/* Hero */}
+      <section style={{ maxWidth: 1080, margin: '0 auto', padding: '64px 28px 56px' }}>
+        <div className="grid grid-cols-1 lg:grid-cols-2 items-center" style={{ gap: 56 }}>
           <div>
-            <div className="inline-flex items-center gap-2 rounded-full bg-brand-50 border border-brand-200/60 px-3 py-1 text-xs font-medium text-brand-700 mb-6">
-              <span className="relative flex h-1.5 w-1.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-brand-500" />
+            <div className="inline-flex items-center gap-2" style={{ borderRadius: 999, background: '#f0f7f9', border: '1px solid #d8e8ec', padding: '5px 12px', fontSize: 12, fontWeight: 500, color: '#0e6a82', marginBottom: 22 }}>
+              <span className="relative flex" style={{ height: 6, width: 6 }}>
+                <span className="absolute inset-0 rounded-full" style={{ background: '#67c5d4', opacity: 0.6, animation: 'rr-ping 1.8s cubic-bezier(0,0,.2,1) infinite' }} />
+                <span className="relative inline-flex rounded-full" style={{ height: 6, width: 6, background: '#0e7490' }} />
               </span>
               Dialysis Transportation Platform
             </div>
-            <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight leading-[1.15]">
+            <h1 style={{ fontSize: 42, lineHeight: 1.1, fontWeight: 600, letterSpacing: '-0.03em', margin: 0 }}>
               Reliable dialysis transportation from pickup to return&nbsp;home.
             </h1>
-            <p className="text-base text-gray-500 mt-5 leading-relaxed">
+            <p style={{ margin: '20px 0 0', fontSize: 16, lineHeight: 1.6, color: '#666', maxWidth: 480 }}>
               Renal Ride helps dialysis clinics coordinate recurring rides, manage
               return transportation, alert staff when patients are at risk of missing
               treatment, and keep caregivers informed.
             </p>
-            <div className="flex flex-wrap items-center gap-3 mt-8">
+            <div className="flex flex-wrap items-center" style={{ gap: 12, marginTop: 28 }}>
               <Link to="/demo">
-                <Button size="lg">Try Interactive Demo</Button>
+                <button className="inline-flex items-center cursor-pointer" style={{ height: 44, padding: '0 22px', borderRadius: 10, border: 'none', background: '#0e7490', color: '#fff', fontSize: 15, fontWeight: 600, fontFamily: 'inherit', gap: 8 }}>
+                  Try Interactive Demo
+                  <svg style={{ width: 16, height: 16 }} fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                  </svg>
+                </button>
               </Link>
               <Link to="/login">
-                <Button variant="outline" size="lg">Sign In</Button>
+                <button className="inline-flex items-center cursor-pointer" style={{ height: 44, padding: '0 22px', borderRadius: 10, border: '1px solid #e2e2e2', background: '#fff', color: '#404040', fontSize: 15, fontWeight: 500, fontFamily: 'inherit' }}>
+                  Sign In
+                </button>
               </Link>
             </div>
-            <div className="flex items-center gap-4 mt-6 text-[11px] text-gray-400">
+            <div className="flex items-center" style={{ gap: 20, marginTop: 24, fontSize: 12, color: '#999' }}>
               <span className="flex items-center gap-1.5">
-                <svg className="w-3.5 h-3.5 text-emerald-500" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                <svg style={{ width: 14, height: 14 }} fill="none" viewBox="0 0 24 24" strokeWidth={2.2} stroke="#10b981">
                   <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                 </svg>
                 Demo uses sample data
               </span>
               <span className="flex items-center gap-1.5">
-                <svg className="w-3.5 h-3.5 text-emerald-500" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                <svg style={{ width: 14, height: 14 }} fill="none" viewBox="0 0 24 24" strokeWidth={2.2} stroke="#10b981">
                   <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                 </svg>
                 5 role demos
               </span>
-              <Link to="/request-demo" className="text-brand-600 hover:text-brand-700 font-medium text-[11px]">
-                Request Clinic Access &rarr;
+              <Link to="/request-demo" style={{ color: '#0e7490', fontWeight: 500, fontSize: 12, textDecoration: 'none' }}>
+                Request Clinic Access →
               </Link>
             </div>
           </div>
 
-          {/* Preview */}
           <div className="hidden lg:block">
             <HeroDashboardPreview />
           </div>
         </div>
-
-        {/* Mobile preview — shown below copy on small screens */}
-        <div className="lg:hidden mt-10">
+        <div className="lg:hidden" style={{ marginTop: 40 }}>
           <HeroDashboardPreview />
         </div>
-      </Section>
+      </section>
 
-      <Divider />
-
-      {/* ----------------------------------------------------------------- */}
-      {/* 1 · Built for Dialysis Schedules                                   */}
-      {/* ----------------------------------------------------------------- */}
-      <Section id="features">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 items-start">
-          <div>
-            <SectionLabel>Recurring Schedules</SectionLabel>
-            <SectionTitle>Built for Dialysis Schedules</SectionTitle>
-            <SectionDesc>
-              Dialysis patients typically receive treatment three times per week on
-              a fixed schedule &mdash; Monday/Wednesday/Friday or
-              Tuesday/Thursday/Saturday. Renal Ride is designed around these
-              recurring patterns, automatically generating ride requests from
-              standing orders so clinic staff don't re-enter the same information
-              every week.
-            </SectionDesc>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            {/* MWF card */}
-            <PreviewCard>
-              <PreviewLabel>Schedule A</PreviewLabel>
-              <div className="flex gap-1.5 mb-3">
-                {['M', 'W', 'F'].map((d) => (
-                  <span key={d} className="h-7 w-7 rounded-md bg-brand-50 text-brand-700 text-xs font-semibold flex items-center justify-center">
-                    {d}
-                  </span>
-                ))}
-                {['T', 'T', 'S'].map((d, i) => (
-                  <span key={`off-${i}`} className="h-7 w-7 rounded-md bg-gray-50 text-gray-300 text-xs font-medium flex items-center justify-center">
-                    {d}
-                  </span>
-                ))}
+      {/* Features */}
+      <section style={{ maxWidth: 1080, margin: '0 auto', padding: '24px 28px 64px' }}>
+        <div className="grid grid-cols-1 sm:grid-cols-3" style={{ gap: 18 }}>
+          {features.map((f) => (
+            <div key={f.title} style={{ background: '#fafafa', border: '1px solid #eee', borderRadius: 14, padding: 22 }}>
+              <div className="flex items-center justify-center" style={{ height: 40, width: 40, borderRadius: 10, background: '#f0f7f9', marginBottom: 15 }}>
+                <svg style={{ width: 20, height: 20 }} fill="none" viewBox="0 0 24 24" strokeWidth={1.7} stroke="#0e7490">
+                  {f.icon}
+                </svg>
               </div>
-              <p className="text-xs text-gray-500">6:00 AM chair time</p>
-              <p className="text-[11px] text-gray-400 mt-0.5">4 patients</p>
-            </PreviewCard>
-
-            {/* TTS card */}
-            <PreviewCard>
-              <PreviewLabel>Schedule B</PreviewLabel>
-              <div className="flex gap-1.5 mb-3">
-                {['M', 'W', 'F'].map((d, i) => (
-                  <span key={`off-${i}`} className="h-7 w-7 rounded-md bg-gray-50 text-gray-300 text-xs font-medium flex items-center justify-center">
-                    {d}
-                  </span>
-                ))}
-                {['T', 'T', 'S'].map((d) => (
-                  <span key={d} className="h-7 w-7 rounded-md bg-brand-50 text-brand-700 text-xs font-semibold flex items-center justify-center">
-                    {d}
-                  </span>
-                ))}
-              </div>
-              <p className="text-xs text-gray-500">10:00 AM chair time</p>
-              <p className="text-[11px] text-gray-400 mt-0.5">3 patients</p>
-            </PreviewCard>
-
-            {/* Standing order */}
-            <PreviewCard className="col-span-2">
-              <PreviewLabel>Standing Order</PreviewLabel>
-              <div className="space-y-2">
-                {[
-                  { name: 'M. Santos', days: 'MWF', type: 'Wheelchair', time: '5:15 AM' },
-                  { name: 'T. Nguyen', days: 'TTS', type: 'Wheelchair', time: '9:10 AM' },
-                  { name: 'R. Johnson', days: 'MWF', type: 'Ambulatory', time: '5:20 AM' },
-                ].map((o) => (
-                  <div key={o.name} className="flex items-center justify-between text-xs">
-                    <span className="font-medium text-gray-700">{o.name}</span>
-                    <div className="flex items-center gap-2">
-                      <Badge variant="neutral">{o.days}</Badge>
-                      <span className="text-gray-400">{o.time}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </PreviewCard>
-          </div>
-        </div>
-      </Section>
-
-      <Divider />
-
-      {/* ----------------------------------------------------------------- */}
-      {/* 2 · Clinic Command Center                                          */}
-      {/* ----------------------------------------------------------------- */}
-      <Section>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 items-start">
-          {/* Preview first on desktop for alternating layout */}
-          <div className="order-2 lg:order-1">
-            <PreviewCard>
-              <PreviewLabel>Patient Status Board</PreviewLabel>
-              <div className="space-y-2.5">
-                {([
-                  { name: 'Maria Santos', status: 'in_treatment' as const, chair: '6:00 AM', note: 'Return at 10:30 AM' },
-                  { name: 'Robert Johnson', status: 'in_treatment' as const, chair: '6:00 AM', note: 'Will-call return' },
-                  { name: 'Dorothy Williams', status: 'driver_en_route' as const, chair: '10:00 AM', note: 'Driver 5 min away' },
-                  { name: 'Linda Martinez', status: 'delayed' as const, chair: '10:00 AM', note: 'Pickup delayed — traffic' },
-                  { name: 'William Davis', status: 'scheduled' as const, chair: '2:00 PM', note: 'Bariatric van confirmed' },
-                  { name: 'Fatima Al-Rashid', status: 'issue_reported' as const, chair: '6:00 AM', note: 'Driver preference issue' },
-                ]).map((p) => (
-                  <div key={p.name} className="flex items-center gap-3 py-1.5">
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs font-medium text-gray-800">{p.name}</p>
-                      <p className="text-[11px] text-gray-400">Chair {p.chair} &middot; {p.note}</p>
-                    </div>
-                    <StatusPill status={p.status} className="text-[10px] px-2 py-0.5" />
-                  </div>
-                ))}
-              </div>
-            </PreviewCard>
-          </div>
-
-          <div className="order-1 lg:order-2">
-            <SectionLabel>Real-Time Visibility</SectionLabel>
-            <SectionTitle>Clinic Command Center</SectionTitle>
-            <SectionDesc>
-              Clinic staff see every patient's transportation status in one view &mdash;
-              who's been picked up, who's in treatment, who's waiting for a return
-              ride, and who's running late. No more calling transportation vendors to
-              ask "where's the driver?" Status updates flow automatically so the
-              front desk always knows what's happening.
-            </SectionDesc>
-          </div>
-        </div>
-      </Section>
-
-      <Divider />
-
-      {/* ----------------------------------------------------------------- */}
-      {/* 3 · Risk Queue                                                     */}
-      {/* ----------------------------------------------------------------- */}
-      <Section>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 items-start">
-          <div>
-            <SectionLabel>Proactive Alerts</SectionLabel>
-            <SectionTitle>Risk Queue</SectionTitle>
-            <SectionDesc>
-              Missed dialysis treatments can be life-threatening. Renal Ride
-              identifies rides at risk &mdash; late drivers, unconfirmed pickups,
-              patients with a history of missed sessions &mdash; and surfaces them
-              in a priority queue before they become emergencies. Staff can
-              intervene early: reassign a driver, call the patient, or alert a
-              caregiver.
-            </SectionDesc>
-          </div>
-
-          <div className="space-y-3">
-            {/* At-risk rides */}
-            {[
-              {
-                name: 'Linda Martinez',
-                issue: 'Driver 18 min late — patient at risk of missing 10:00 AM chair time',
-                risk: 'high' as const,
-                action: 'Reassign driver',
-              },
-              {
-                name: 'Dorothy Williams',
-                issue: 'Original driver called off. Replacement running 10 min behind.',
-                risk: 'medium' as const,
-                action: 'Monitor',
-              },
-              {
-                name: 'William Davis',
-                issue: 'Bariatric van has no backup vehicle if delayed',
-                risk: 'high' as const,
-                action: 'Confirm availability',
-              },
-            ].map((item) => (
-              <PreviewCard key={item.name} className="!p-4">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <p className="text-sm font-medium text-gray-900">{item.name}</p>
-                      <Badge variant={item.risk}>{item.risk}</Badge>
-                    </div>
-                    <p className="text-xs text-gray-500 leading-relaxed">{item.issue}</p>
-                  </div>
-                  <button className="shrink-0 text-[11px] font-medium text-brand-600 hover:text-brand-700 whitespace-nowrap cursor-pointer">
-                    {item.action}
-                  </button>
-                </div>
-              </PreviewCard>
-            ))}
-          </div>
-        </div>
-      </Section>
-
-      <Divider />
-
-      {/* ----------------------------------------------------------------- */}
-      {/* 4 · Return Ride Manager                                            */}
-      {/* ----------------------------------------------------------------- */}
-      <Section>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 items-start">
-          {/* Preview */}
-          <div className="order-2 lg:order-1 space-y-3">
-            <PreviewCard>
-              <PreviewLabel>Return Rides — Will-Call</PreviewLabel>
-              <div className="space-y-3">
-                {[
-                  { name: 'Robert Johnson', status: 'In treatment — nurse will notify', ready: false },
-                  { name: 'James Chen', status: 'Treatment complete — requesting pickup', ready: true },
-                ].map((p) => (
-                  <div key={p.name} className="flex items-center justify-between gap-3">
-                    <div className="min-w-0">
-                      <p className="text-xs font-medium text-gray-800">{p.name}</p>
-                      <p className="text-[11px] text-gray-400">{p.status}</p>
-                    </div>
-                    {p.ready ? (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 text-emerald-700 px-2 py-0.5 text-[10px] font-medium">
-                        <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                        Ready
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-gray-50 text-gray-500 px-2 py-0.5 text-[10px] font-medium">
-                        <span className="h-1.5 w-1.5 rounded-full bg-gray-300" />
-                        In treatment
-                      </span>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </PreviewCard>
-
-            <PreviewCard>
-              <PreviewLabel>Return Rides — Scheduled</PreviewLabel>
-              <div className="space-y-3">
-                {[
-                  { name: 'Maria Santos', time: '10:30 AM', vehicle: 'Wheelchair Van' },
-                  { name: 'Dorothy Williams', time: '2:30 PM', vehicle: 'Sedan' },
-                ].map((p) => (
-                  <div key={p.name} className="flex items-center justify-between gap-3">
-                    <div className="min-w-0">
-                      <p className="text-xs font-medium text-gray-800">{p.name}</p>
-                      <p className="text-[11px] text-gray-400">{p.vehicle}</p>
-                    </div>
-                    <span className="text-xs font-medium text-gray-600">{p.time}</span>
-                  </div>
-                ))}
-              </div>
-            </PreviewCard>
-          </div>
-
-          <div className="order-1 lg:order-2">
-            <SectionLabel>Flexible Returns</SectionLabel>
-            <SectionTitle>Return Ride Manager</SectionTitle>
-            <SectionDesc>
-              Treatment end times are unpredictable. Some clinics schedule a fixed
-              return pickup, but many use will-call &mdash; requesting a driver only
-              when the patient is actually ready. Renal Ride supports both modes.
-              Nurses can mark a patient as "ready for pickup" with one click, and
-              the system dispatches a return ride automatically.
-            </SectionDesc>
-          </div>
-        </div>
-      </Section>
-
-      <Divider />
-
-      {/* ----------------------------------------------------------------- */}
-      {/* 5 · Caregiver Updates                                              */}
-      {/* ----------------------------------------------------------------- */}
-      <Section>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 items-start">
-          <div>
-            <SectionLabel>Family Communication</SectionLabel>
-            <SectionTitle>Caregiver Updates</SectionTitle>
-            <SectionDesc>
-              Family members and caregivers worry. Renal Ride sends automated
-              status updates &mdash; via SMS, email, or both &mdash; at every key
-              moment: driver dispatched, patient picked up, arrived at clinic,
-              treatment complete, and returned home. Caregivers stay informed
-              without having to call the clinic or the driver.
-            </SectionDesc>
-          </div>
-
-          <PreviewCard>
-            <PreviewLabel>Caregiver Notifications &mdash; Carlos Santos (Son)</PreviewLabel>
-            <div className="space-y-0">
-              {[
-                { time: '5:15 AM', event: 'Driver dispatched', detail: 'Tony R. — Wheelchair Van — ETA 5:15 AM', icon: 'dispatched' },
-                { time: '5:18 AM', event: 'Patient picked up', detail: 'Maria picked up from 1815 Alhambra Blvd', icon: 'pickup' },
-                { time: '5:52 AM', event: 'Arrived at clinic', detail: 'Fresenius Kidney Care — Riverside', icon: 'arrived' },
-                { time: '10:25 AM', event: 'Treatment complete', detail: 'Ready for return ride', icon: 'treatment' },
-                { time: '10:32 AM', event: 'Return driver en route', detail: 'Tony R. — ETA 10:35 AM', icon: 'dispatched' },
-                { time: '11:10 AM', event: 'Returned home', detail: 'Maria dropped off at 1815 Alhambra Blvd', icon: 'home' },
-              ].map((step, i, arr) => (
-                <div key={step.time} className="flex gap-3">
-                  {/* Timeline line + dot */}
-                  <div className="flex flex-col items-center">
-                    <div className={`h-2 w-2 rounded-full mt-1.5 shrink-0 ${i < 4 ? 'bg-brand-500' : i === 4 ? 'bg-amber-400' : 'bg-gray-300'}`} />
-                    {i < arr.length - 1 && <div className="w-px flex-1 bg-gray-100 my-0.5" />}
-                  </div>
-                  <div className="pb-4 min-w-0">
-                    <div className="flex items-baseline gap-2">
-                      <p className="text-xs font-medium text-gray-800">{step.event}</p>
-                      <span className="text-[11px] text-gray-400">{step.time}</span>
-                    </div>
-                    <p className="text-[11px] text-gray-400 mt-0.5">{step.detail}</p>
-                  </div>
-                </div>
-              ))}
+              <h3 style={{ fontSize: 16, fontWeight: 600, margin: 0 }}>{f.title}</h3>
+              <p style={{ fontSize: 14, color: '#737373', lineHeight: 1.55, margin: '8px 0 0' }}>{f.desc}</p>
             </div>
-          </PreviewCard>
+          ))}
         </div>
-      </Section>
+      </section>
 
-      <Divider />
-
-      {/* ----------------------------------------------------------------- */}
-      {/* 6 · Vendor Reliability                                             */}
-      {/* ----------------------------------------------------------------- */}
-      <Section>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 items-start">
-          {/* Preview */}
-          <div className="order-2 lg:order-1">
-            <PreviewCard>
-              <PreviewLabel>Vendor Performance</PreviewLabel>
-              <div className="overflow-x-auto -mx-1">
-                <table className="w-full text-xs">
-                  <thead>
-                    <tr className="border-b border-gray-100">
-                      <th className="text-left font-medium text-gray-500 pb-2.5 pr-4 pl-1">Vendor</th>
-                      <th className="text-right font-medium text-gray-500 pb-2.5 px-2">On-Time</th>
-                      <th className="text-right font-medium text-gray-500 pb-2.5 px-2">Cancel&nbsp;%</th>
-                      <th className="text-right font-medium text-gray-500 pb-2.5 px-2">Avg&nbsp;Delay</th>
-                      <th className="text-right font-medium text-gray-500 pb-2.5 pl-2 pr-1">Capabilities</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {[
-                      { name: 'CareRide Medical', ontime: 94, cancel: 2, delay: '4 min', wc: true, dtd: true },
-                      { name: 'Metro Access', ontime: 91, cancel: 3, delay: '6 min', wc: false, dtd: false },
-                      { name: 'Valley Health', ontime: 88, cancel: 5, delay: '8 min', wc: true, dtd: false },
-                    ].map((v) => (
-                      <tr key={v.name} className="border-b border-gray-50 last:border-0">
-                        <td className="py-2.5 pr-4 pl-1 font-medium text-gray-800 whitespace-nowrap">{v.name}</td>
-                        <td className="py-2.5 px-2 text-right">
-                          <span className={v.ontime >= 92 ? 'text-emerald-700' : v.ontime >= 90 ? 'text-amber-700' : 'text-red-600'}>
-                            {v.ontime}%
-                          </span>
-                        </td>
-                        <td className="py-2.5 px-2 text-right text-gray-600">{v.cancel}%</td>
-                        <td className="py-2.5 px-2 text-right text-gray-600">{v.delay}</td>
-                        <td className="py-2.5 pl-2 pr-1 text-right">
-                          <div className="flex items-center justify-end gap-1">
-                            {v.wc && <Badge variant="low">WC</Badge>}
-                            {v.dtd && <Badge variant="success">DTD</Badge>}
-                            {!v.wc && !v.dtd && <Badge variant="neutral">Amb</Badge>}
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </PreviewCard>
-          </div>
-
-          <div className="order-1 lg:order-2">
-            <SectionLabel>Accountability</SectionLabel>
-            <SectionTitle>Vendor Reliability</SectionTitle>
-            <SectionDesc>
-              Not all transportation vendors perform equally. Renal Ride tracks
-              on-time rates, cancellation rates, average delay, and reported issues
-              by vendor &mdash; so clinics can make data-driven decisions about
-              which providers to keep, which need improvement plans, and where to
-              route high-risk patients who can't afford a late pickup.
-            </SectionDesc>
-          </div>
-        </div>
-      </Section>
-
-      <Divider />
-
-      {/* ----------------------------------------------------------------- */}
-      {/* CTA                                                                */}
-      {/* ----------------------------------------------------------------- */}
-      <section className="max-w-5xl mx-auto px-6 py-16 sm:py-24">
-        <div className="rounded-2xl bg-gradient-to-br from-brand-600 to-brand-800 px-8 py-12 sm:py-16 text-center">
-          <h2 className="text-xl sm:text-2xl font-semibold text-white tracking-tight">
+      {/* CTA Banner */}
+      <section style={{ maxWidth: 1080, margin: '0 auto', padding: '0 28px 72px' }}>
+        <div className="text-center" style={{ borderRadius: 20, background: 'linear-gradient(135deg, #0e7490, #155e75)', padding: '56px 32px' }}>
+          <h2 style={{ fontSize: 28, fontWeight: 600, color: '#fff', letterSpacing: '-0.02em', margin: 0 }}>
             See Renal Ride in action
           </h2>
-          <p className="text-sm text-brand-200 mt-2 max-w-lg mx-auto leading-relaxed">
+          <p style={{ fontSize: 15, color: '#bfe3ea', maxWidth: 440, margin: '12px auto 0', lineHeight: 1.55 }}>
             Explore the interactive demo with sample data, or sign in to manage
             real dialysis transportation.
           </p>
-          <div className="flex flex-wrap items-center justify-center gap-3 mt-8">
+          <div className="flex flex-wrap items-center justify-center" style={{ gap: 12, marginTop: 28 }}>
             <Link to="/demo">
-              <button className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-white text-brand-700 text-sm font-semibold hover:bg-brand-50 transition-colors cursor-pointer">
+              <button className="inline-flex items-center cursor-pointer" style={{ height: 44, padding: '0 24px', borderRadius: 10, border: 'none', background: '#fff', color: '#0e6a82', fontSize: 15, fontWeight: 600, fontFamily: 'inherit', gap: 8 }}>
                 Try Interactive Demo
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                <svg style={{ width: 16, height: 16 }} fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
                 </svg>
               </button>
             </Link>
-            <Link to="/login">
-              <button className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-brand-500/30 text-white text-sm font-medium hover:bg-brand-500/40 transition-colors cursor-pointer border border-brand-400/30">
-                Sign In
-              </button>
-            </Link>
           </div>
-          <div className="mt-4 text-center">
-            <Link to="/request-demo" className="text-sm text-brand-200 hover:text-white transition-colors">
-              Request clinic access &rarr;
+          <div style={{ marginTop: 16 }}>
+            <Link to="/request-demo" style={{ fontSize: 14, color: '#bfe3ea', textDecoration: 'none' }}>
+              Request clinic access →
             </Link>
           </div>
         </div>
       </section>
 
-      {/* ----------------------------------------------------------------- */}
-      {/* Footer                                                             */}
-      {/* ----------------------------------------------------------------- */}
-      <footer className="border-t border-gray-100">
-        <div className="max-w-5xl mx-auto px-6 py-8">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div className="flex items-center gap-2">
-              <div className="h-6 w-6 rounded-md bg-brand-600 flex items-center justify-center">
-                <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                </svg>
-              </div>
-              <span className="text-xs font-semibold text-gray-700">Renal Ride</span>
+      {/* Footer */}
+      <footer style={{ borderTop: '1px solid #f0f0f0' }}>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between" style={{ maxWidth: 1080, margin: '0 auto', padding: '24px 28px', gap: 16 }}>
+          <div className="flex items-center gap-2">
+            <div className="flex items-center justify-center" style={{ height: 24, width: 24, borderRadius: 6, background: '#0e7490' }}>
+              <svg style={{ width: 14, height: 14 }} className="text-white" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+              </svg>
             </div>
-            <div className="flex items-center gap-4 text-xs text-gray-400">
-              <span>Dialysis Transportation Coordination</span>
-              <span className="hidden sm:inline">&middot;</span>
-              <span className="inline-flex items-center rounded-md bg-amber-50 px-1.5 py-0.5 text-[10px] font-medium text-amber-600 border border-amber-200/60">
-                Demo
-              </span>
-            </div>
+            <span style={{ fontSize: 13, fontWeight: 600, color: '#525252' }}>Renal Ride</span>
           </div>
+          <span style={{ fontSize: 12, color: '#a3a3a3' }}>Dialysis transportation coordination — Prototype</span>
         </div>
       </footer>
     </div>

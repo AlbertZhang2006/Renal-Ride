@@ -27,6 +27,8 @@ export interface NavItem {
   label: string;
   path: string;
   icon: string;
+  badge?: string;
+  badgeColor?: 'red' | 'amber';
 }
 
 // --- Domain types ---
