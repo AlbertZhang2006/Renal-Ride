@@ -18,6 +18,7 @@ import {
   isDemoTerminalStatus,
   demoStatusLabels,
 } from '../data/DemoScenarioContext';
+import { GuidedDemoAssistant, GuidedActionHighlight } from '../components/GuidedDemoAssistant';
 import type { Ride, RideStatus, RiskLevel } from '../types';
 
 // Demo vendor: CareRide Medical Transport
@@ -242,10 +243,8 @@ export function VendorView() {
           {/* Guided Demo Scenario — Active Trip Card */}
           {isGuidedDemo && demo && (
             <>
-              {/* Demo Banner */}
-              <div className="rounded-xl bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-800">
-                This is a sample interactive demo using fictional patient data.
-              </div>
+              {/* Guided Demo Assistant */}
+              <GuidedDemoAssistant />
 
               {/* Active Trip Card */}
               <div className="bg-white rounded-2xl border-2 border-amber-300 shadow-sm overflow-hidden">
@@ -373,12 +372,14 @@ export function VendorView() {
                           Send Readiness Check
                         </button>
                       )}
-                      <button
-                        onClick={() => demo.driverArrived()}
-                        className="px-4 py-2.5 rounded-xl text-sm font-semibold bg-amber-500 text-white hover:bg-amber-600 active:bg-amber-700 transition-colors cursor-pointer"
-                      >
-                        Arrived
-                      </button>
+                      <GuidedActionHighlight isRecommended={demo.status === 'patient_ready'}>
+                        <button
+                          onClick={() => demo.driverArrived()}
+                          className="px-4 py-2.5 rounded-xl text-sm font-semibold bg-amber-500 text-white hover:bg-amber-600 active:bg-amber-700 transition-colors cursor-pointer"
+                        >
+                          Arrived
+                        </button>
+                      </GuidedActionHighlight>
                       <button
                         onClick={() => demo.pickupFailed()}
                         className="px-4 py-2.5 rounded-xl text-sm font-medium bg-white border border-red-300 text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
@@ -390,12 +391,14 @@ export function VendorView() {
 
                   {demo.status === 'driver_arrived' && (
                     <div className="flex flex-wrap gap-2 pt-1">
-                      <button
-                        onClick={() => demo.patientPickedUp()}
-                        className="px-4 py-2.5 rounded-xl text-sm font-semibold bg-amber-500 text-white hover:bg-amber-600 active:bg-amber-700 transition-colors cursor-pointer"
-                      >
-                        Patient Onboard
-                      </button>
+                      <GuidedActionHighlight isRecommended>
+                        <button
+                          onClick={() => demo.patientPickedUp()}
+                          className="px-4 py-2.5 rounded-xl text-sm font-semibold bg-amber-500 text-white hover:bg-amber-600 active:bg-amber-700 transition-colors cursor-pointer"
+                        >
+                          Patient Onboard
+                        </button>
+                      </GuidedActionHighlight>
                       <button
                         onClick={() => demo.pickupFailed()}
                         className="px-4 py-2.5 rounded-xl text-sm font-medium bg-white border border-red-300 text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
@@ -407,12 +410,14 @@ export function VendorView() {
 
                   {demo.status === 'en_route_to_clinic' && (
                     <div className="flex flex-wrap gap-2 pt-1">
-                      <button
-                        onClick={() => demo.arrivedAtClinic()}
-                        className="px-4 py-2.5 rounded-xl text-sm font-semibold bg-amber-500 text-white hover:bg-amber-600 active:bg-amber-700 transition-colors cursor-pointer"
-                      >
-                        Arrived at Clinic
-                      </button>
+                      <GuidedActionHighlight isRecommended>
+                        <button
+                          onClick={() => demo.arrivedAtClinic()}
+                          className="px-4 py-2.5 rounded-xl text-sm font-semibold bg-amber-500 text-white hover:bg-amber-600 active:bg-amber-700 transition-colors cursor-pointer"
+                        >
+                          Arrived at Clinic
+                        </button>
+                      </GuidedActionHighlight>
                     </div>
                   )}
 
@@ -669,9 +674,7 @@ export function VendorView() {
           {/* Guided Demo Scenario — Trip Status Card */}
           {isGuidedDemo && demo && (
             <>
-              <div className="rounded-xl bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-800">
-                This is a sample interactive demo using fictional patient data.
-              </div>
+              <GuidedDemoAssistant />
 
               <div className="bg-white rounded-2xl border-2 border-amber-300 shadow-sm p-4 space-y-3">
                 <div className="flex items-center justify-between">
@@ -719,12 +722,14 @@ export function VendorView() {
                         Send Readiness Check
                       </button>
                     )}
-                    <button
-                      onClick={() => demo.driverArrived()}
-                      className="flex-1 px-3 py-2 rounded-xl text-xs font-semibold bg-amber-500 text-white hover:bg-amber-600 transition-colors cursor-pointer"
-                    >
-                      Arrived
-                    </button>
+                    <GuidedActionHighlight isRecommended={demo.status === 'patient_ready'}>
+                      <button
+                        onClick={() => demo.driverArrived()}
+                        className="flex-1 px-3 py-2 rounded-xl text-xs font-semibold bg-amber-500 text-white hover:bg-amber-600 transition-colors cursor-pointer"
+                      >
+                        Arrived
+                      </button>
+                    </GuidedActionHighlight>
                     <button
                       onClick={() => demo.pickupFailed()}
                       className="px-3 py-2 rounded-xl text-xs font-medium bg-white border border-red-300 text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
@@ -736,12 +741,14 @@ export function VendorView() {
 
                 {demo.status === 'driver_arrived' && (
                   <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => demo.patientPickedUp()}
-                      className="flex-1 px-3 py-2 rounded-xl text-xs font-semibold bg-amber-500 text-white hover:bg-amber-600 transition-colors cursor-pointer"
-                    >
-                      Patient Onboard
-                    </button>
+                    <GuidedActionHighlight isRecommended>
+                      <button
+                        onClick={() => demo.patientPickedUp()}
+                        className="flex-1 px-3 py-2 rounded-xl text-xs font-semibold bg-amber-500 text-white hover:bg-amber-600 transition-colors cursor-pointer"
+                      >
+                        Patient Onboard
+                      </button>
+                    </GuidedActionHighlight>
                     <button
                       onClick={() => demo.pickupFailed()}
                       className="px-3 py-2 rounded-xl text-xs font-medium bg-white border border-red-300 text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
@@ -753,12 +760,14 @@ export function VendorView() {
 
                 {demo.status === 'en_route_to_clinic' && (
                   <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => demo.arrivedAtClinic()}
-                      className="flex-1 px-3 py-2 rounded-xl text-xs font-semibold bg-amber-500 text-white hover:bg-amber-600 transition-colors cursor-pointer"
-                    >
-                      Arrived at Clinic
-                    </button>
+                    <GuidedActionHighlight isRecommended>
+                      <button
+                        onClick={() => demo.arrivedAtClinic()}
+                        className="flex-1 px-3 py-2 rounded-xl text-xs font-semibold bg-amber-500 text-white hover:bg-amber-600 transition-colors cursor-pointer"
+                      >
+                        Arrived at Clinic
+                      </button>
+                    </GuidedActionHighlight>
                   </div>
                 )}
 

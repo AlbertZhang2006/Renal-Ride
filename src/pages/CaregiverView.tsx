@@ -19,6 +19,7 @@ import {
   DEMO_CLINIC_INFO,
   DEMO_RIDE_INFO,
 } from '../data/DemoScenarioContext';
+import { GuidedDemoAssistant } from '../components/GuidedDemoAssistant';
 
 const caregiver = caregivers[0]; // Carlos Santos
 const patient = patients.find(p => p.id === caregiver.patientId)!;
@@ -916,12 +917,8 @@ function DemoScenarioSection() {
 
   return (
     <>
-      {/* Demo Banner */}
-      <div className="bg-violet-50 border border-violet-200 rounded-2xl px-4 py-3">
-        <p className="text-sm text-violet-700 text-center font-medium">
-          This is a sample interactive demo using fictional patient data.
-        </p>
-      </div>
+      {/* Guided Demo Assistant */}
+      <GuidedDemoAssistant />
 
       {/* Mary Johnson Status Card */}
       <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">

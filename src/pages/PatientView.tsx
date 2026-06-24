@@ -9,6 +9,7 @@ import { cn } from '../utils/cn';
 import { useNotifications } from '../data/NotificationContext';
 import { useRole } from '../data/RoleContext';
 import { useDemoScenario, DemoStatusBadge, demoTimelineSteps, getDemoStepIndex, isDemoErrorStatus, DEMO_PATIENT, DEMO_CLINIC_INFO, DEMO_RIDE_INFO } from '../data/DemoScenarioContext';
+import { GuidedDemoAssistant, GuidedActionHighlight } from '../components/GuidedDemoAssistant';
 import type { RideStatus } from '../types';
 
 const patient = patients[0];
@@ -196,10 +197,8 @@ export function PatientView() {
 
             return (
               <>
-                {/* Demo Mode Banner */}
-                <div className="bg-blue-50 border border-blue-200 rounded-2xl px-4 py-3 text-sm text-blue-800">
-                  This is a sample interactive demo using fictional patient data.
-                </div>
+                {/* Guided Demo Assistant */}
+                <GuidedDemoAssistant />
 
                 {/* Mary Johnson's Journey Card */}
                 <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
@@ -225,12 +224,14 @@ export function PatientView() {
                       <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
                         <p className="text-base font-semibold text-amber-800 mb-3">Your driver is on the way. Are you ready for pickup?</p>
                         <div className="grid grid-cols-2 gap-2">
-                          <button
-                            onClick={() => demo.patientReady()}
-                            className="px-4 py-3 rounded-xl bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700 transition-colors cursor-pointer"
-                          >
-                            I'm Ready
-                          </button>
+                          <GuidedActionHighlight isRecommended={showReadinessAlert}>
+                            <button
+                              onClick={() => demo.patientReady()}
+                              className="w-full px-4 py-3 rounded-xl bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700 transition-colors cursor-pointer"
+                            >
+                              I'm Ready
+                            </button>
+                          </GuidedActionHighlight>
                           <button
                             onClick={() => demo.patientNeedsHelp()}
                             className="px-4 py-3 rounded-xl bg-amber-500 text-white text-sm font-semibold hover:bg-amber-600 transition-colors cursor-pointer"

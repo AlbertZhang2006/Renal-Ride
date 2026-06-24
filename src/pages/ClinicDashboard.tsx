@@ -18,6 +18,7 @@ import {
   demoStatusLabels,
   type DemoRideStatus,
 } from '../data/DemoScenarioContext';
+import { GuidedDemoAssistant, GuidedActionHighlight } from '../components/GuidedDemoAssistant';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -341,33 +342,6 @@ const demoRiskMessages: Record<string, string> = {
   pickup_failed: 'Pickup failed for Mary Johnson — immediate action needed',
 };
 
-function DemoBanner() {
-  const demoCtx = useDemoScenario();
-  if (!demoCtx) return null;
-  const { resetDemoScenario } = demoCtx;
-  return (
-    <div className="flex items-center justify-between rounded-xl px-4 py-3 mb-4" style={{ background: '#ecfdf5', border: '1px solid #a7f3d0' }}>
-      <div className="flex items-center gap-2">
-        <svg className="w-4 h-4 text-teal-600 shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
-        </svg>
-        <p className="text-xs font-medium text-teal-800">
-          This is a sample interactive demo using fictional patient data.
-        </p>
-      </div>
-      <button
-        onClick={resetDemoScenario}
-        className="inline-flex items-center gap-1.5 text-[11px] font-medium text-teal-700 hover:text-teal-900 bg-white/70 hover:bg-white border border-teal-200 rounded-lg px-2.5 py-1 transition-colors cursor-pointer"
-      >
-        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182" />
-        </svg>
-        Reset Demo
-      </button>
-    </div>
-  );
-}
-
 function DemoMaryJohnsonCard() {
   const demoCtx = useDemoScenario();
   if (!demoCtx) return null;
@@ -431,15 +405,17 @@ function DemoMaryJohnsonCard() {
         {/* Action area */}
         {status === 'arrived_at_clinic' && (
           <div className="mt-3 pt-3 border-t border-gray-100">
-            <button
-              onClick={startTreatment}
-              className="inline-flex items-center gap-1.5 text-xs font-medium text-white bg-teal-600 hover:bg-teal-700 rounded-lg px-3 py-1.5 transition-colors cursor-pointer"
-            >
-              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z" />
-              </svg>
-              Start Treatment
-            </button>
+            <GuidedActionHighlight isRecommended>
+              <button
+                onClick={startTreatment}
+                className="inline-flex items-center gap-1.5 text-xs font-medium text-white bg-teal-600 hover:bg-teal-700 rounded-lg px-3 py-1.5 transition-colors cursor-pointer"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z" />
+                </svg>
+                Start Treatment
+              </button>
+            </GuidedActionHighlight>
           </div>
         )}
 
@@ -574,8 +550,9 @@ export function ClinicDashboard() {
         </div>
       </div>
 
-      {/* Demo Banner */}
-      {isGuidedDemo && <DemoBanner />}
+      {/* Guided Demo Assistant */}
+      {isGuidedDemo && <GuidedDemoAssistant />}
+      {isGuidedDemo && <div className="mb-4" />}
 
       {/* KPI Row */}
       <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3 mb-4">
