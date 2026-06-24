@@ -86,6 +86,3 @@ body {
 .rr-delay-2 { transition-delay: 0.2s; }
 .rr-delay-3 { transition-delay: 0.3s; }
 .rr-delay-4 { transition-delay: 0.4s; }
-
-.rr-scroll-hide::-webkit-scrollbar { display: none; }
-.rr-scroll-hide { -ms-overflow-style: none; scrollbar-width: none; }

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { StatusPill } from '../components/StatusPill';
 import { Badge } from '../components/Badge';
@@ -125,23 +125,14 @@ const features = [
   },
 ];
 
-const stats = [
-  { value: '99.2%', label: 'On-time pickups' },
-  { value: '< 3 min', label: 'Alert response' },
-  { value: '5', label: 'Role dashboards' },
-  { value: '24/7', label: 'Real-time tracking' },
-];
 
 export function Landing() {
   const pageRef = useScrollReveal();
-  const carouselRef = useRef<HTMLDivElement>(null);
+  const [roleIdx, setRoleIdx] = useState(0);
+  const touchRef = useRef<{ x: number; y: number } | null>(null);
 
-  const scrollCarousel = useCallback((dir: 'left' | 'right') => {
-    const el = carouselRef.current;
-    if (!el) return;
-    const card = el.querySelector<HTMLElement>(':scope > div');
-    const w = card ? card.offsetWidth + 20 : 340;
-    el.scrollBy({ left: dir === 'right' ? w : -w, behavior: 'smooth' });
+  const goToRole = useCallback((i: number) => {
+    setRoleIdx((i + roles.length) % roles.length);
   }, []);
 
   return (
@@ -206,18 +197,6 @@ export function Landing() {
               </Link>
             </div>
             <div className="flex flex-wrap items-center" style={{ gap: 20, marginTop: 28, fontSize: 13, color: '#888', animation: 'rr-hero-up .9s cubic-bezier(.16,1,.3,1) .35s both' }}>
-              <span className="flex items-center gap-1.5">
-                <svg style={{ width: 14, height: 14 }} fill="none" viewBox="0 0 24 24" strokeWidth={2.2} stroke="#10b981">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-                </svg>
-                Sample data included
-              </span>
-              <span className="flex items-center gap-1.5">
-                <svg style={{ width: 14, height: 14 }} fill="none" viewBox="0 0 24 24" strokeWidth={2.2} stroke="#10b981">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-                </svg>
-                No account needed
-              </span>
               <Link to="/request-demo" style={{ color: '#0e7490', fontWeight: 500, textDecoration: 'none' }}>
                 Request clinic access&nbsp;→
               </Link>
@@ -233,46 +212,36 @@ export function Landing() {
         </div>
       </section>
 
-      {/* ─── Stats strip ─── */}
-      <section style={{ borderTop: '1px solid #f0f0f0', borderBottom: '1px solid #f0f0f0', background: '#fafafa' }}>
-        <div className="grid grid-cols-2 sm:grid-cols-4" style={{ maxWidth: 1120, margin: '0 auto', padding: '0 28px' }}>
-          {stats.map((s, i) => (
-            <div key={s.label} className="rr-reveal" style={{ padding: '28px 0', textAlign: 'center', borderRight: i < stats.length - 1 ? '1px solid #f0f0f0' : 'none', transitionDelay: `${i * 0.08}s` }}>
-              <p style={{ fontSize: 28, fontWeight: 700, color: '#0e7490', margin: 0, letterSpacing: '-0.02em' }}>{s.value}</p>
-              <p style={{ fontSize: 13, color: '#888', margin: '4px 0 0' }}>{s.label}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
       {/* ─── Full-width visual section ─── */}
       <section className="rr-reveal" style={{ position: 'relative', overflow: 'hidden', minHeight: 420 }}>
         <img
-          src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=1920&q=80"
-          alt="Healthcare coordination"
+          src="https://images.unsplash.com/photo-1516574187841-cb9cc2ca948b?auto=format&fit=crop&w=1920&q=80"
+          alt="Patient arriving for dialysis care"
           style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 40%' }}
           onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
         />
         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, rgba(14,116,144,.93) 0%, rgba(21,94,117,.88) 50%, rgba(12,60,78,.92) 100%)' }} />
-        <div style={{ position: 'relative', zIndex: 1, maxWidth: 720, margin: '0 auto', padding: '80px 28px', textAlign: 'center' }}>
-          <p style={{ fontSize: 14, fontWeight: 600, color: '#67e8f9', letterSpacing: '0.08em', textTransform: 'uppercase', margin: '0 0 16px' }}>
-            Why it matters
-          </p>
-          <h2 style={{ fontSize: 32, fontWeight: 700, color: '#fff', lineHeight: 1.2, letterSpacing: '-0.02em', margin: 0 }}>
-            Every missed ride is a missed treatment.
-          </h2>
-          <p style={{ fontSize: 17, color: 'rgba(255,255,255,.8)', lineHeight: 1.65, margin: '20px auto 0', maxWidth: 560 }}>
-            Renal Ride closes the coordination gap between clinics, transportation vendors, patients, and caregivers — reducing no-shows and improving dialysis adherence.
-          </p>
-          <div className="flex flex-wrap items-center justify-center" style={{ gap: 36, marginTop: 40 }}>
+        <div style={{ position: 'relative', zIndex: 1, maxWidth: 1120, margin: '0 auto', padding: '80px 28px' }}>
+          <div style={{ textAlign: 'center', maxWidth: 720, margin: '0 auto' }}>
+            <p style={{ fontSize: 14, fontWeight: 600, color: '#67e8f9', letterSpacing: '0.08em', textTransform: 'uppercase', margin: '0 0 16px' }}>
+              Why it matters
+            </p>
+            <h2 style={{ fontSize: 36, fontWeight: 700, color: '#fff', lineHeight: 1.2, letterSpacing: '-0.02em', margin: 0 }}>
+              Every missed ride is a missed treatment.
+            </h2>
+            <p style={{ fontSize: 17, color: 'rgba(255,255,255,.8)', lineHeight: 1.65, margin: '20px auto 0', maxWidth: 640 }}>
+              Renal Ride closes the coordination gap between clinics, transportation vendors, patients, and caregivers — reducing no-shows and improving dialysis adherence.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3" style={{ gap: 0, marginTop: 48 }}>
             {[
-              { n: '3.5×', d: 'per week', sub: 'average dialysis sessions' },
-              { n: '25%', d: 'of patients', sub: 'face transportation barriers' },
-              { n: '100%', d: 'visibility', sub: 'across every ride' },
-            ].map(item => (
-              <div key={item.n} style={{ textAlign: 'center' }}>
-                <p style={{ fontSize: 32, fontWeight: 700, color: '#fff', margin: 0, letterSpacing: '-0.02em' }}>{item.n}</p>
-                <p style={{ fontSize: 13, color: 'rgba(255,255,255,.65)', margin: '2px 0 0' }}>{item.d}</p>
+              { n: '500K+', d: 'patients on dialysis in the U.S.' },
+              { n: '3×', d: 'treatments needed per week' },
+              { n: '30%', d: 'higher hospitalization from missed sessions' },
+            ].map((item, i) => (
+              <div key={item.n} style={{ textAlign: 'center', padding: '24px 20px', borderLeft: i > 0 ? '1px solid rgba(255,255,255,.15)' : 'none' }}>
+                <p style={{ fontSize: 40, fontWeight: 700, color: '#fff', margin: 0, letterSpacing: '-0.02em' }}>{item.n}</p>
+                <p style={{ fontSize: 14, color: 'rgba(255,255,255,.7)', margin: '6px 0 0' }}>{item.d}</p>
               </div>
             ))}
           </div>
@@ -281,66 +250,130 @@ export function Landing() {
 
       {/* ─── Role showcase ─── */}
       <section style={{ padding: '80px 0 72px' }}>
-        <div className="rr-reveal" style={{ maxWidth: 1120, margin: '0 auto', padding: '0 28px 0' }}>
-          <p style={{ fontSize: 13, fontWeight: 600, color: '#0e7490', letterSpacing: '0.06em', textTransform: 'uppercase', margin: '0 0 10px' }}>
+        <div className="rr-reveal" style={{ maxWidth: 1120, margin: '0 auto', padding: '0 28px' }}>
+          <p style={{ fontSize: 13, fontWeight: 600, color: '#0e7490', letterSpacing: '0.06em', textTransform: 'uppercase', margin: '0 0 10px', textAlign: 'center' }}>
             Role-based experience
           </p>
-          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between" style={{ gap: 16, marginBottom: 36 }}>
-            <div>
-              <h2 style={{ fontSize: 32, fontWeight: 700, letterSpacing: '-0.02em', margin: 0, color: '#0a0a0a' }}>
-                Every role, one platform.
-              </h2>
-              <p style={{ fontSize: 16, color: '#666', margin: '8px 0 0', maxWidth: 480 }}>
-                Patients, caregivers, clinics, vendors, and admins each get a purpose-built dashboard.
-              </p>
-            </div>
-            <div className="hidden sm:flex items-center gap-2 shrink-0">
-              <button onClick={() => scrollCarousel('left')} className="cursor-pointer" style={{ width: 40, height: 40, borderRadius: 10, border: '1px solid #e0e0e0', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background .15s' }}
-                onMouseEnter={e => { e.currentTarget.style.background = '#f5f5f5'; }}
-                onMouseLeave={e => { e.currentTarget.style.background = '#fff'; }}
-              >
-                <svg style={{ width: 18, height: 18 }} fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="#555"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" /></svg>
-              </button>
-              <button onClick={() => scrollCarousel('right')} className="cursor-pointer" style={{ width: 40, height: 40, borderRadius: 10, border: '1px solid #e0e0e0', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background .15s' }}
-                onMouseEnter={e => { e.currentTarget.style.background = '#f5f5f5'; }}
-                onMouseLeave={e => { e.currentTarget.style.background = '#fff'; }}
-              >
-                <svg style={{ width: 18, height: 18 }} fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="#555"><path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>
-              </button>
-            </div>
-          </div>
+          <h2 style={{ fontSize: 32, fontWeight: 700, letterSpacing: '-0.02em', margin: '0 0 8px', color: '#0a0a0a', textAlign: 'center' }}>
+            Every role, one platform.
+          </h2>
+          <p style={{ fontSize: 16, color: '#666', margin: '0 auto 48px', maxWidth: 480, textAlign: 'center' }}>
+            Patients, caregivers, clinics, vendors, and admins each get a purpose-built dashboard.
+          </p>
         </div>
 
-        <div
-          ref={carouselRef}
-          className="rr-scroll-hide rr-reveal"
-          style={{ display: 'flex', gap: 20, overflowX: 'auto', scrollSnapType: 'x mandatory', paddingLeft: 'max(28px, calc((100% - 1064px)/2))', paddingRight: 28, paddingBottom: 8 }}
-        >
-          {roles.map((role, i) => (
-            <div
-              key={role.title}
-              className={`rr-delay-${i < 5 ? i : 4}`}
-              style={{ minWidth: 280, maxWidth: 300, scrollSnapAlign: 'start', borderRadius: 18, overflow: 'hidden', border: '1px solid #eaeaea', background: '#fff', flexShrink: 0, transition: 'transform .25s ease, box-shadow .25s ease' }}
-              onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-6px)'; e.currentTarget.style.boxShadow = '0 16px 40px rgba(0,0,0,.1)'; }}
-              onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = 'none'; }}
-            >
-              <div style={{ height: 150, background: role.gradient, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <div style={{ width: 64, height: 64, borderRadius: 16, background: 'rgba(255,255,255,.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(8px)' }}>
-                  <svg style={{ width: 32, height: 32 }} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="#fff">
-                    {role.icon}
-                  </svg>
-                </div>
-              </div>
-              <div style={{ padding: '20px 22px 24px' }}>
-                <h3 style={{ fontSize: 18, fontWeight: 700, margin: 0, color: '#171717' }}>{role.title}</h3>
-                <p style={{ fontSize: 14, color: '#666', lineHeight: 1.6, margin: '8px 0 0', minHeight: 66 }}>{role.desc}</p>
-                <Link to="/demo" style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 13, fontWeight: 600, color: '#0e7490', textDecoration: 'none', marginTop: 14 }}>
-                  {role.cta}
-                  <svg style={{ width: 14, height: 14 }} fill="none" viewBox="0 0 24 24" strokeWidth={2.2} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" /></svg>
-                </Link>
-              </div>
+        <div className="rr-reveal" style={{ maxWidth: 900, margin: '0 auto', position: 'relative', padding: '0 60px' }}>
+          {/* Left arrow */}
+          <button
+            onClick={() => goToRole(roleIdx - 1)}
+            className="cursor-pointer"
+            style={{ position: 'absolute', left: 8, top: '50%', transform: 'translateY(-50%)', zIndex: 2, width: 48, height: 48, borderRadius: 999, border: '1px solid #e0e0e0', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 16px rgba(0,0,0,.1)', transition: 'all .2s' }}
+            onMouseEnter={e => { e.currentTarget.style.background = '#0e7490'; e.currentTarget.style.borderColor = '#0e7490'; (e.currentTarget.querySelector('svg') as SVGElement).style.stroke = '#fff'; }}
+            onMouseLeave={e => { e.currentTarget.style.background = '#fff'; e.currentTarget.style.borderColor = '#e0e0e0'; (e.currentTarget.querySelector('svg') as SVGElement).style.stroke = '#555'; }}
+          >
+            <svg style={{ width: 20, height: 20, transition: 'stroke .2s' }} fill="none" viewBox="0 0 24 24" strokeWidth={2.2} stroke="#555"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" /></svg>
+          </button>
+
+          {/* Right arrow */}
+          <button
+            onClick={() => goToRole(roleIdx + 1)}
+            className="cursor-pointer"
+            style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', zIndex: 2, width: 48, height: 48, borderRadius: 999, border: '1px solid #e0e0e0', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 16px rgba(0,0,0,.1)', transition: 'all .2s' }}
+            onMouseEnter={e => { e.currentTarget.style.background = '#0e7490'; e.currentTarget.style.borderColor = '#0e7490'; (e.currentTarget.querySelector('svg') as SVGElement).style.stroke = '#fff'; }}
+            onMouseLeave={e => { e.currentTarget.style.background = '#fff'; e.currentTarget.style.borderColor = '#e0e0e0'; (e.currentTarget.querySelector('svg') as SVGElement).style.stroke = '#555'; }}
+          >
+            <svg style={{ width: 20, height: 20, transition: 'stroke .2s' }} fill="none" viewBox="0 0 24 24" strokeWidth={2.2} stroke="#555"><path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>
+          </button>
+
+          {/* 3-card visible carousel with swipe */}
+          <div
+            style={{ overflow: 'hidden' }}
+            onTouchStart={e => { touchRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY }; }}
+            onTouchEnd={e => {
+              if (!touchRef.current) return;
+              const dx = e.changedTouches[0].clientX - touchRef.current.x;
+              const dy = e.changedTouches[0].clientY - touchRef.current.y;
+              if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
+                goToRole(dx < 0 ? roleIdx + 1 : roleIdx - 1);
+              }
+              touchRef.current = null;
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 20, minHeight: 420 }}>
+              {roles.map((role, i) => {
+                const diff = i - roleIdx;
+                const isCenter = diff === 0;
+                const isAdj = diff === 1 || diff === -1 || (roleIdx === 0 && i === roles.length - 1) || (roleIdx === roles.length - 1 && i === 0);
+                const isLeft = diff === -1 || (roleIdx === 0 && i === roles.length - 1);
+                if (!isCenter && !isAdj) return null;
+                return (
+                  <div
+                    key={role.title}
+                    onClick={() => { if (!isCenter) goToRole(i); }}
+                    className={isAdj ? 'cursor-pointer' : ''}
+                    style={{
+                      width: isCenter ? '60%' : '20%',
+                      minWidth: isCenter ? 340 : 120,
+                      flexShrink: 0,
+                      opacity: isCenter ? 1 : 0.45,
+                      transform: isCenter ? 'scale(1)' : 'scale(0.88)',
+                      filter: isCenter ? 'none' : 'blur(1px)',
+                      transition: 'all .45s cubic-bezier(.16,1,.3,1)',
+                      pointerEvents: 'auto',
+                      order: isLeft ? 0 : isCenter ? 1 : 2,
+                    }}
+                  >
+                    <div style={{ borderRadius: 18, overflow: 'hidden', border: '1px solid #eaeaea', background: '#fff', boxShadow: isCenter ? '0 12px 40px rgba(0,0,0,.1)' : '0 2px 8px rgba(0,0,0,.04)' }}>
+                      <div style={{ height: isCenter ? 170 : 100, background: role.gradient, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'height .45s cubic-bezier(.16,1,.3,1)' }}>
+                        <div style={{ width: isCenter ? 72 : 44, height: isCenter ? 72 : 44, borderRadius: isCenter ? 18 : 12, background: 'rgba(255,255,255,.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(8px)', transition: 'all .45s cubic-bezier(.16,1,.3,1)' }}>
+                          <svg style={{ width: isCenter ? 36 : 22, height: isCenter ? 36 : 22, transition: 'all .45s cubic-bezier(.16,1,.3,1)' }} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="#fff">
+                            {role.icon}
+                          </svg>
+                        </div>
+                      </div>
+                      <div style={{ padding: isCenter ? '24px 28px 28px' : '14px 16px 16px', transition: 'padding .45s cubic-bezier(.16,1,.3,1)' }}>
+                        <h3 style={{ fontSize: isCenter ? 20 : 14, fontWeight: 700, margin: 0, color: '#171717', transition: 'font-size .45s cubic-bezier(.16,1,.3,1)' }}>{role.title}</h3>
+                        {isCenter && (
+                          <>
+                            <p style={{ fontSize: 15, color: '#666', lineHeight: 1.65, margin: '10px 0 0' }}>{role.desc}</p>
+                            <Link to="/demo" style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 14, fontWeight: 600, color: '#0e7490', textDecoration: 'none', marginTop: 18 }}>
+                              {role.cta}
+                              <svg style={{ width: 15, height: 15 }} fill="none" viewBox="0 0 24 24" strokeWidth={2.2} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" /></svg>
+                            </Link>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
-          ))}
+          </div>
+
+          {/* Dot indicators */}
+          <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginTop: 28 }}>
+            {roles.map((role, i) => (
+              <button
+                key={role.title}
+                onClick={() => goToRole(i)}
+                className="cursor-pointer"
+                style={{
+                  width: roleIdx === i ? 28 : 10,
+                  height: 10,
+                  borderRadius: 999,
+                  border: 'none',
+                  background: roleIdx === i ? '#0e7490' : '#d4d4d4',
+                  transition: 'all .3s cubic-bezier(.16,1,.3,1)',
+                  padding: 0,
+                }}
+              />
+            ))}
+          </div>
+
+          {/* Swipe hint on mobile */}
+          <p className="sm:hidden" style={{ textAlign: 'center', fontSize: 12, color: '#a3a3a3', marginTop: 12 }}>
+            Swipe to explore roles
+          </p>
         </div>
       </section>
 
