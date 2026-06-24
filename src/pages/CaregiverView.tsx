@@ -221,6 +221,36 @@ export function CaregiverView() {
         ))}
       </div>
 
+      {/* Authenticated empty state — no linked patient yet */}
+      {!isDemo && (
+        <div className="flex flex-col items-center justify-center py-16 px-4">
+          <div className="w-20 h-20 rounded-full bg-violet-50 flex items-center justify-center mb-6">
+            <svg className="w-10 h-10 text-violet-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+            </svg>
+          </div>
+          <h1 className="text-xl font-semibold text-gray-900 text-center">No linked patient yet</h1>
+          <p className="text-sm text-gray-500 text-center mt-3 max-w-sm leading-relaxed">
+            You have not been linked to a patient's transportation schedule. Once a clinic or patient invites you, you'll be able to see ride updates, pickup status, clinic arrival, and return trip notifications.
+          </p>
+          <div className="mt-8 w-full max-w-xs space-y-3">
+            <button className="w-full px-4 py-3 rounded-xl bg-violet-600 text-white text-sm font-semibold hover:bg-violet-700 transition-colors cursor-pointer">
+              Enter Invite Code
+            </button>
+            <button className="w-full px-4 py-3 rounded-xl border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer">
+              Request Access
+            </button>
+            <button
+              onClick={() => navigate('/demo')}
+              className="w-full px-4 py-3 rounded-xl border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer"
+            >
+              View Demo
+            </button>
+          </div>
+        </div>
+      )}
+
+      {isDemo && (<>
       {/* Tab Navigation */}
       <div className="flex rounded-2xl bg-white border border-gray-200 shadow-sm mb-6 overflow-hidden">
         {tabItems.map(t => (
@@ -891,6 +921,7 @@ export function CaregiverView() {
           </div>
         </div>
       </Modal>
+      </>)}
     </div>
   );
 }

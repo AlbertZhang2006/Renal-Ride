@@ -146,6 +146,36 @@ export function PatientView() {
         ))}
       </div>
 
+      {/* Authenticated empty state — no real ride data yet */}
+      {!isDemo && (
+        <div className="flex flex-col items-center justify-center py-16 px-4">
+          <div className="w-20 h-20 rounded-full bg-brand-50 flex items-center justify-center mb-6">
+            <svg className="w-10 h-10 text-brand-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0H21M3.375 14.25h-.375a1.5 1.5 0 0 1-1.5-1.5v-3a1.5 1.5 0 0 1 1.5-1.5h17.25a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1-1.5 1.5h-.375m-17.25 0h17.25M6.75 6.75h10.5" />
+            </svg>
+          </div>
+          <h1 className="text-xl font-semibold text-gray-900 text-center">No ride schedule yet</h1>
+          <p className="text-sm text-gray-500 text-center mt-3 max-w-sm leading-relaxed">
+            Your dialysis transportation schedule has not been added to Renal Ride yet. Once your clinic connects your account, you'll see your next pickup, driver status, return ride, and caregiver notifications here.
+          </p>
+          <div className="mt-8 w-full max-w-xs space-y-3">
+            <button className="w-full px-4 py-3 rounded-xl bg-brand-600 text-white text-sm font-semibold hover:bg-brand-700 transition-colors cursor-pointer">
+              Enter Clinic Invite Code
+            </button>
+            <button className="w-full px-4 py-3 rounded-xl border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer">
+              Request Help
+            </button>
+            <button
+              onClick={() => navigate('/demo')}
+              className="w-full px-4 py-3 rounded-xl border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer"
+            >
+              View Demo
+            </button>
+          </div>
+        </div>
+      )}
+
+      {isDemo && (<>
       {/* Bottom Tab Navigation */}
       <div className="flex rounded-2xl bg-white border border-gray-200 shadow-sm mb-6 overflow-hidden">
         {tabItems.map(t => (
@@ -995,6 +1025,7 @@ export function PatientView() {
           </button>
         </div>
       </Modal>
+      </>)}
     </div>
   );
 }
