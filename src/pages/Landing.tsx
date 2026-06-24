@@ -73,8 +73,10 @@ export function Landing() {
         <div className="flex items-center justify-between" style={{ maxWidth: 1080, margin: '0 auto', padding: '0 28px', height: 60 }}>
           <div className="flex items-center gap-2">
             <div className="flex items-center justify-center" style={{ height: 30, width: 30, borderRadius: 8, background: '#0e7490' }}>
-              <svg style={{ width: 16, height: 16 }} className="text-white" fill="none" viewBox="0 0 24 24" strokeWidth={2.2} stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+              <svg style={{ width: 16, height: 16 }} className="text-white" fill="none" viewBox="0 0 32 32" stroke="currentColor">
+                <path strokeLinecap="round" strokeWidth={3} d="M6.5 19.5C9 19.5 11 17.5 13.5 15.5S18 13.5 20 15s3.5 4 6 4" />
+                <circle cx="6.5" cy="19.5" r="2.5" fill="currentColor" stroke="none" />
+                <circle cx="26" cy="19" r="2.5" fill="#34d399" stroke="none" />
               </svg>
             </div>
             <span style={{ fontSize: 15, fontWeight: 600, letterSpacing: '-0.01em' }}>Renal Ride</span>
@@ -206,8 +208,10 @@ export function Landing() {
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between" style={{ maxWidth: 1080, margin: '0 auto', padding: '24px 28px', gap: 16 }}>
           <div className="flex items-center gap-2">
             <div className="flex items-center justify-center" style={{ height: 24, width: 24, borderRadius: 6, background: '#0e7490' }}>
-              <svg style={{ width: 14, height: 14 }} className="text-white" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+              <svg style={{ width: 14, height: 14 }} className="text-white" fill="none" viewBox="0 0 32 32" stroke="currentColor">
+                <path strokeLinecap="round" strokeWidth={3} d="M6.5 19.5C9 19.5 11 17.5 13.5 15.5S18 13.5 20 15s3.5 4 6 4" />
+                <circle cx="6.5" cy="19.5" r="2.5" fill="currentColor" stroke="none" />
+                <circle cx="26" cy="19" r="2.5" fill="#34d399" stroke="none" />
               </svg>
             </div>
             <span style={{ fontSize: 13, fontWeight: 600, color: '#525252' }}>Renal Ride</span>

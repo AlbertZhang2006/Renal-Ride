@@ -61,8 +61,10 @@ export function AuthSignup() {
           <div className="max-w-4xl mx-auto px-6 h-14 flex items-center">
             <Link to="/" className="flex items-center gap-2">
               <div className="h-7 w-7 rounded-lg bg-brand-600 flex items-center justify-center">
-                <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 32 32" stroke="currentColor">
+                  <path strokeLinecap="round" strokeWidth={3} d="M6.5 19.5C9 19.5 11 17.5 13.5 15.5S18 13.5 20 15s3.5 4 6 4" />
+                  <circle cx="6.5" cy="19.5" r="2.5" fill="currentColor" stroke="none" />
+                  <circle cx="26" cy="19" r="2.5" fill="#34d399" stroke="none" />
                 </svg>
               </div>
               <span className="text-sm font-semibold text-gray-900">Renal Ride</span>
@@ -107,8 +109,10 @@ export function AuthSignup() {
         <div className="max-w-4xl mx-auto px-6 h-14 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
             <div className="h-7 w-7 rounded-lg bg-brand-600 flex items-center justify-center">
-              <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+              <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 32 32" stroke="currentColor">
+                <path strokeLinecap="round" strokeWidth={3} d="M6.5 19.5C9 19.5 11 17.5 13.5 15.5S18 13.5 20 15s3.5 4 6 4" />
+                <circle cx="6.5" cy="19.5" r="2.5" fill="currentColor" stroke="none" />
+                <circle cx="26" cy="19" r="2.5" fill="#34d399" stroke="none" />
               </svg>
             </div>
             <span className="text-sm font-semibold text-gray-900">Renal Ride</span>
