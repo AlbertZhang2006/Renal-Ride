@@ -38,6 +38,7 @@ export function GuidedDemoLogin() {
   const { setRole } = useRole();
 
   function handleSelect(role: UserRole) {
+    localStorage.removeItem('renal-ride-demo-scenario');
     setRole(role);
     navigate(`/demo/guided/${role}`);
   }
