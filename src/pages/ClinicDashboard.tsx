@@ -561,7 +561,6 @@ export function ClinicDashboard() {
   const { stats } = useClinicStats();
 
   const location = useLocation();
-  const isDemo = location.pathname.startsWith('/demo');
   const isGuidedDemo = location.pathname.startsWith('/demo/guided');
 
   return (

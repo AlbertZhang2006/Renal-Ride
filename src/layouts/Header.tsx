@@ -11,6 +11,7 @@ export function Header({ onMenuToggle }: HeaderProps) {
   const { user, logout } = useRole();
   const navigate = useNavigate();
   const location = useLocation();
+  const isGuidedDemo = location.pathname.startsWith('/demo/guided');
   const isDemo = location.pathname.startsWith('/demo');
 
   if (!user) return null;
@@ -56,7 +57,7 @@ export function Header({ onMenuToggle }: HeaderProps) {
             className="hidden sm:inline-flex items-center"
             style={{ fontSize: 11, fontWeight: 500, color: '#b45309', background: '#fffbeb', border: '1px solid #fceec5', padding: '3px 9px', borderRadius: 6 }}
           >
-            Demo Mode
+            {isGuidedDemo ? 'Guided Demo' : 'Operations Demo'}
           </span>
         )}
 

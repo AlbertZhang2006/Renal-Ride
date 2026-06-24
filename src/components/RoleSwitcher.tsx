@@ -13,8 +13,8 @@ export function RoleSwitcher() {
   const ref = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const location = useLocation();
-  const isDemo = location.pathname.startsWith('/demo');
-
+  const isGuidedDemo = location.pathname.startsWith('/demo/guided');
+  const isOpsDemo = location.pathname.startsWith('/demo/operations');
   useEffect(() => {
     function handleClick(e: MouseEvent) {
       if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
@@ -27,7 +27,8 @@ export function RoleSwitcher() {
 
   function handleSelect(r: UserRole) {
     setRole(r);
-    navigate(isDemo ? `/demo/${r}` : `/app/${r}`);
+    const prefix = isGuidedDemo ? '/demo/guided' : isOpsDemo ? '/demo/operations' : '/app';
+    navigate(`${prefix}/${r}`);
     setOpen(false);
   }
 
@@ -55,7 +56,7 @@ export function RoleSwitcher() {
           <div className="px-3 py-2 border-b border-gray-100">
             <p className="text-[11px] font-medium text-gray-400 uppercase tracking-wider">Switch Role</p>
           </div>
-          {roles.map((r) => {
+          {roles.filter(r => !(isGuidedDemo && r === 'admin')).map((r) => {
             const rc = roleColors[r];
             return (
               <button

@@ -11,16 +11,32 @@ export function AppLayout() {
   const { toasts } = useNotifications();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
-  const isDemo = location.pathname.startsWith('/demo');
+  const isGuidedDemo = location.pathname.startsWith('/demo/guided');
+  const isOpsDemo = location.pathname.startsWith('/demo/operations');
+  const isDemo = isGuidedDemo || isOpsDemo;
 
-  if (!role) return <Navigate to={isDemo ? '/demo' : '/login'} replace />;
+  if (!role) return <Navigate to={isGuidedDemo ? '/demo/guided' : isOpsDemo ? '/demo/operations' : isDemo ? '/demo' : '/login'} replace />;
 
   return (
     <div className="flex flex-col h-screen bg-gray-50/50">
       {isDemo && (
-        <div className="bg-amber-50 border-b border-amber-200/60 px-4 py-1.5 text-center shrink-0">
-          <p className="text-[11px] text-amber-700">
-            <span className="font-semibold">Prototype Demo</span> — Sample data only. Not for real patient information. HIPAA/security review required before production use.
+        <div className={cn(
+          'border-b px-4 py-1.5 text-center shrink-0',
+          isGuidedDemo ? 'bg-emerald-50 border-emerald-200/60' : 'bg-amber-50 border-amber-200/60',
+        )}>
+          <p className={cn('text-[11px]', isGuidedDemo ? 'text-emerald-700' : 'text-amber-700')}>
+            <span className="font-semibold">{isGuidedDemo ? 'Guided Demo' : 'Operations Demo'}</span>
+            {' — '}
+            {isGuidedDemo
+              ? 'Follow Mary Johnson through a live dialysis pickup journey. Actions sync across all roles.'
+              : 'Sample data only. Not for real patient information. HIPAA/security review required before production use.'}
+            {' '}
+            <a
+              href="/demo"
+              className={cn('underline underline-offset-2', isGuidedDemo ? 'text-emerald-800' : 'text-amber-800')}
+            >
+              Switch demo mode
+            </a>
           </p>
         </div>
       )}

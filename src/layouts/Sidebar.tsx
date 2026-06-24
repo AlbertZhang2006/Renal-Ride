@@ -11,13 +11,16 @@ interface SidebarProps {
 export function Sidebar({ open, onClose }: SidebarProps) {
   const { role } = useRole();
   const location = useLocation();
-  const isDemo = location.pathname.startsWith('/demo');
+  const isGuidedDemo = location.pathname.startsWith('/demo/guided');
+  const isOpsDemo = location.pathname.startsWith('/demo/operations');
+  const isDemo = isGuidedDemo || isOpsDemo;
 
   if (!role) return null;
 
+  const demoPrefix = isGuidedDemo ? '/demo/guided' : isOpsDemo ? '/demo/operations' : '/demo';
   const navItems = roleNavItems[role].map((item) => ({
     ...item,
-    path: isDemo ? item.path.replace('/app', '/demo') : item.path,
+    path: isDemo ? item.path.replace('/app', demoPrefix) : item.path,
   }));
 
   const sidebar = (
