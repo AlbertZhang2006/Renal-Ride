@@ -74,6 +74,7 @@ export function PatientView() {
   const { user } = useRole();
   const tab = tabFromPath(location.pathname);
   const isDemo = location.pathname.startsWith('/demo');
+  const isGuidedDemo = location.pathname.startsWith('/demo/guided');
 
   const { addNotification, addAuditLogEntry, addToast } = useNotifications();
   const demo = useDemoScenario();
@@ -100,7 +101,7 @@ export function PatientView() {
   const greeting = now.getHours() < 12 ? 'Good morning' : now.getHours() < 17 ? 'Good afternoon' : 'Good evening';
   const dateStr = `${dayFull[now.getDay()]}, ${monthFull[now.getMonth()]} ${now.getDate()}`;
 
-  const base = isDemo ? '/demo/patient' : '/app/patient';
+  const base = isGuidedDemo ? '/demo/guided/patient' : isDemo ? '/demo/operations/patient' : '/app/patient';
   const tabItems: { key: Tab; label: string; path: string }[] = [
     { key: 'today', label: 'Today', path: base },
     { key: 'schedule', label: 'Schedule', path: `${base}/schedule` },
@@ -185,8 +186,8 @@ export function PatientView() {
       {/* ===== TODAY TAB ===== */}
       {tab === 'today' && (
         <div className="space-y-5">
-          {/* Demo Scenario Section */}
-          {isDemo && (() => {
+          {/* Guided Demo Scenario Section */}
+          {isGuidedDemo && demo && (() => {
             const demoStepIndex = getDemoStepIndex(demo.status);
             const isError = isDemoErrorStatus(demo.status);
             const showReadinessAlert = demo.status === 'driver_en_route_to_patient' || demo.status === 'readiness_prompt_sent';
@@ -405,13 +406,16 @@ export function PatientView() {
             );
           })()}
 
-          {/* Greeting */}
+          {/* Greeting — hidden in guided demo since Mary Johnson's card handles it */}
+          {!isGuidedDemo && (
           <div>
             <h1 className="text-2xl font-bold text-gray-900">{greeting}, {isDemo ? patient.firstName : (user?.name?.split(' ')[0] ?? patient.firstName)}</h1>
             <p className="text-base text-gray-500 mt-1">{dateStr}</p>
           </div>
+          )}
 
-          {/* Active Ride Card */}
+          {/* Active Ride Card — operations demo and production only */}
+          {!isGuidedDemo && (<>
           <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
             <div className="bg-brand-600 px-5 py-3 flex items-center justify-between">
               <span className="text-white font-semibold text-base">Your Ride Today</span>
@@ -565,7 +569,7 @@ export function PatientView() {
             </button>
           </div>
 
-          {/* Ride Timeline */}
+          {/* Ride Timeline — static */}
           <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Today's Journey</h3>
             <div className="space-y-0">
@@ -620,6 +624,7 @@ export function PatientView() {
               })}
             </div>
           </div>
+          </>)}
         </div>
       )}
 

@@ -117,6 +117,7 @@ export function VendorView() {
   const navigate = useNavigate();
   const tab = tabFromPath(location.pathname);
   const isDemo = location.pathname.startsWith('/demo');
+  const isGuidedDemo = location.pathname.startsWith('/demo/guided');
 
   const { addNotification, addAuditLogEntry, addToast: addGlobalToast } = useNotifications();
 
@@ -183,7 +184,7 @@ export function VendorView() {
     return driverActiveStatuses.includes(s) || s === 'return_assigned';
   });
 
-  const base = isDemo ? '/demo/vendor' : '/app/vendor';
+  const base = isGuidedDemo ? '/demo/guided/vendor' : isDemo ? '/demo/operations/vendor' : '/app/vendor';
   const tabItems: { key: Tab; label: string; path: string }[] = [
     { key: 'dispatch', label: 'Dispatch', path: base },
     { key: 'trips', label: 'Trips', path: `${base}/trips` },
@@ -238,8 +239,8 @@ export function VendorView() {
       {tab === 'dispatch' && (
         <div className="space-y-5">
 
-          {/* Demo Scenario — Active Trip Card */}
-          {isDemo && (
+          {/* Guided Demo Scenario — Active Trip Card */}
+          {isGuidedDemo && demo && (
             <>
               {/* Demo Banner */}
               <div className="rounded-xl bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-800">
@@ -665,8 +666,8 @@ export function VendorView() {
       {tab === 'trips' && (
         <div className="space-y-5">
 
-          {/* Demo Scenario — Trip Status Card */}
-          {isDemo && (
+          {/* Guided Demo Scenario — Trip Status Card */}
+          {isGuidedDemo && demo && (
             <>
               <div className="rounded-xl bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-800">
                 This is a sample interactive demo using fictional patient data.

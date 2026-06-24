@@ -47,7 +47,7 @@ export function Login() {
 
   function handleSelect(role: UserRole) {
     setRole(role);
-    navigate(`/demo/${role}`);
+    navigate(`/demo/operations/${role}`);
   }
 
   return (
@@ -63,9 +63,14 @@ export function Login() {
             </div>
             <span style={{ fontSize: 14, fontWeight: 600, color: '#171717' }}>Renal Ride</span>
           </Link>
-          <span style={{ fontSize: 11, fontWeight: 500, color: '#b45309', background: '#fffbeb', border: '1px solid #fceec5', padding: '3px 9px', borderRadius: 6 }}>
-            Demo Mode
-          </span>
+          <div className="flex items-center gap-3">
+            <Link to="/demo" style={{ fontSize: 12, color: '#0e7490', fontWeight: 500, textDecoration: 'none' }}>
+              ← Demo Home
+            </Link>
+            <span style={{ fontSize: 11, fontWeight: 500, color: '#b45309', background: '#fffbeb', border: '1px solid #fceec5', padding: '3px 9px', borderRadius: 6 }}>
+              Operations Demo
+            </span>
+          </div>
         </div>
       </header>
 
@@ -73,11 +78,10 @@ export function Login() {
       <div className="flex-1 flex flex-col items-center justify-center" style={{ padding: '48px 24px 96px' }}>
         <div className="text-center" style={{ marginBottom: 36, maxWidth: 500 }}>
           <h1 style={{ fontSize: 26, fontWeight: 600, letterSpacing: '-0.02em', margin: 0 }}>
-            Choose a role to explore
+            Operations Dashboard Demo
           </h1>
           <p style={{ fontSize: 14, color: '#666', lineHeight: 1.55, margin: '10px 0 0' }}>
-            Renal Ride coordinates dialysis transportation between patients, caregivers,
-            clinics, and vendors. Select a role below to see the demo dashboard.
+            Explore the full Renal Ride platform with sample data — multiple patients, rides, vendors, risk queue, reports, and more. Select a role below.
           </p>
         </div>
 

@@ -140,6 +140,7 @@ export function CaregiverView() {
   const { user } = useRole();
   const tab = tabFromPath(location.pathname);
   const isDemo = location.pathname.startsWith('/demo');
+  const isGuidedDemo = location.pathname.startsWith('/demo/guided');
 
   const { addNotification, addAuditLogEntry, addToast: addGlobalToast } = useNotifications();
   const [toasts, setToasts] = useState<Toast[]>([]);
@@ -168,7 +169,7 @@ export function CaregiverView() {
   const greeting = now.getHours() < 12 ? 'Good morning' : now.getHours() < 17 ? 'Good afternoon' : 'Good evening';
   const dateStr = `${dayFull[now.getDay()]}, ${monthFull[now.getMonth()]} ${now.getDate()}`;
 
-  const base = isDemo ? '/demo/caregiver' : '/app/caregiver';
+  const base = isGuidedDemo ? '/demo/guided/caregiver' : isDemo ? '/demo/operations/caregiver' : '/app/caregiver';
   const tabItems: { key: Tab; label: string; path: string }[] = [
     { key: 'status', label: 'Status', path: base },
     { key: 'alerts', label: 'Alerts', path: `${base}/alerts` },
@@ -265,8 +266,8 @@ export function CaregiverView() {
       {/* ===== STATUS TAB ===== */}
       {tab === 'status' && (
         <div className="space-y-5">
-          {/* Demo Scenario Section */}
-          {isDemo && <DemoScenarioSection />}
+          {/* Guided Demo Scenario Section */}
+          {isGuidedDemo && <DemoScenarioSection />}
 
           {/* Greeting */}
           <div>
@@ -437,8 +438,8 @@ export function CaregiverView() {
             <p className="text-base text-gray-500 mt-1">Updates about {patient.firstName}'s rides</p>
           </div>
 
-          {/* Demo Notifications in Alerts */}
-          {isDemo && <DemoAlertsSection />}
+          {/* Guided Demo Notifications in Alerts */}
+          {isGuidedDemo && <DemoAlertsSection />}
 
           {alerts.length === 0 ? (
             <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-8 text-center">
@@ -903,7 +904,9 @@ const demoSeverityStyles: Record<string, { bg: string; border: string; icon: str
 };
 
 function DemoScenarioSection() {
-  const { status, notifications, riskLevel, resetDemoScenario } = useDemoScenario();
+  const demoCtx = useDemoScenario();
+  if (!demoCtx) return null;
+  const { status, notifications, riskLevel, resetDemoScenario } = demoCtx;
   const demoStep = getDemoStepIndex(status);
   const isError = isDemoErrorStatus(status);
 
@@ -1059,7 +1062,9 @@ function DemoScenarioSection() {
 }
 
 function DemoAlertsSection() {
-  const { notifications } = useDemoScenario();
+  const demoCtx = useDemoScenario();
+  if (!demoCtx) return null;
+  const { notifications } = demoCtx;
 
   const caregiverNotifs = notifications
     .filter(n => n.recipientRole === 'caregiver')

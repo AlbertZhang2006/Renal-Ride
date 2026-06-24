@@ -342,7 +342,9 @@ const demoRiskMessages: Record<string, string> = {
 };
 
 function DemoBanner() {
-  const { resetDemoScenario } = useDemoScenario();
+  const demoCtx = useDemoScenario();
+  if (!demoCtx) return null;
+  const { resetDemoScenario } = demoCtx;
   return (
     <div className="flex items-center justify-between rounded-xl px-4 py-3 mb-4" style={{ background: '#ecfdf5', border: '1px solid #a7f3d0' }}>
       <div className="flex items-center gap-2">
@@ -367,7 +369,9 @@ function DemoBanner() {
 }
 
 function DemoMaryJohnsonCard() {
-  const { status, riskLevel, startTreatment } = useDemoScenario();
+  const demoCtx = useDemoScenario();
+  if (!demoCtx) return null;
+  const { status, riskLevel, startTreatment } = demoCtx;
   const isRisk = isDemoErrorStatus(status) || status === 'patient_needs_help' || status === 'patient_not_ready';
   const statusDescription = demoStatusLabels[status];
 
@@ -456,7 +460,9 @@ function DemoMaryJohnsonCard() {
 }
 
 function DemoRiskAlert() {
-  const { status } = useDemoScenario();
+  const demoCtx = useDemoScenario();
+  if (!demoCtx) return null;
+  const { status } = demoCtx;
   const riskStatuses: DemoRideStatus[] = ['patient_needs_help', 'patient_not_ready', 'cancel_requested', 'pickup_failed'];
   if (!riskStatuses.includes(status)) return null;
 
@@ -484,7 +490,9 @@ function DemoRiskAlert() {
 }
 
 function DemoEventFeed() {
-  const { events } = useDemoScenario();
+  const demoCtx = useDemoScenario();
+  if (!demoCtx) return null;
+  const { events } = demoCtx;
   const visibleEvents = events.slice(0, 8);
 
   return (
@@ -554,6 +562,7 @@ export function ClinicDashboard() {
 
   const location = useLocation();
   const isDemo = location.pathname.startsWith('/demo');
+  const isGuidedDemo = location.pathname.startsWith('/demo/guided');
 
   return (
     <div>
@@ -567,7 +576,7 @@ export function ClinicDashboard() {
       </div>
 
       {/* Demo Banner */}
-      {isDemo && <DemoBanner />}
+      {isGuidedDemo && <DemoBanner />}
 
       {/* KPI Row */}
       <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3 mb-4">
@@ -595,10 +604,10 @@ export function ClinicDashboard() {
       </div>
 
       {/* Demo: Mary Johnson Highlighted Card */}
-      {isDemo && <DemoMaryJohnsonCard />}
+      {isGuidedDemo && <DemoMaryJohnsonCard />}
 
       {/* Demo: Risk Alert */}
-      {isDemo && <DemoRiskAlert />}
+      {isGuidedDemo && <DemoRiskAlert />}
 
       {/* Transportation board */}
       <div style={{ background: '#fff', border: '1px solid #eaeaea', borderRadius: 12, overflow: 'hidden' }}>
@@ -785,7 +794,7 @@ export function ClinicDashboard() {
       </div>
 
       {/* Demo: Live Event Feed */}
-      {isDemo && <DemoEventFeed />}
+      {isGuidedDemo && <DemoEventFeed />}
 
       {/* Modals */}
       {modalState?.type === 'view' && (

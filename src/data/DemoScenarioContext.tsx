@@ -441,8 +441,6 @@ export function DemoScenarioProvider({ children }: { children: ReactNode }) {
   );
 }
 
-export function useDemoScenario(): DemoScenarioContextValue {
-  const ctx = useContext(DemoScenarioContext);
-  if (!ctx) throw new Error('useDemoScenario must be used within DemoScenarioProvider');
-  return ctx;
+export function useDemoScenario(): DemoScenarioContextValue | null {
+  return useContext(DemoScenarioContext);
 }

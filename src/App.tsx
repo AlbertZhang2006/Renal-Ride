@@ -6,6 +6,8 @@ import { DemoScenarioProvider } from './data/DemoScenarioContext';
 import { AppLayout } from './layouts/AppLayout';
 import { Landing } from './pages/Landing';
 import { Login } from './pages/Login';
+import { DemoSelector } from './pages/DemoSelector';
+import { GuidedDemoLogin } from './pages/GuidedDemoLogin';
 import { AuthLogin } from './pages/AuthLogin';
 import { AuthSignup } from './pages/AuthSignup';
 import { ForgotPassword } from './pages/ForgotPassword';
@@ -32,6 +34,16 @@ function DemoProviders() {
         <DemoScenarioProvider>
           <Outlet />
         </DemoScenarioProvider>
+      </NotificationProvider>
+    </RoleProvider>
+  );
+}
+
+function OperationsDemoProviders() {
+  return (
+    <RoleProvider>
+      <NotificationProvider>
+        <Outlet />
       </NotificationProvider>
     </RoleProvider>
   );
@@ -86,8 +98,42 @@ export default function App() {
           <Route path="/request-demo" element={<RequestDemo />} />
           <Route path="/pending-approval" element={<PendingApproval />} />
 
-          {/* Demo routes — localStorage role, mock data */}
-          <Route path="/demo" element={<DemoProviders />}>
+          {/* Demo selector */}
+          <Route path="/demo" element={<DemoSelector />} />
+
+          {/* Guided demo — shared interactive scenario with DemoScenarioProvider */}
+          <Route path="/demo/guided" element={<DemoProviders />}>
+            <Route index element={<GuidedDemoLogin />} />
+            <Route element={<AppLayout />}>
+              <Route path="patient" element={<PatientView />} />
+              <Route path="patient/schedule" element={<PatientView />} />
+              <Route path="patient/help" element={<PatientView />} />
+              <Route path="patient/profile" element={<PatientView />} />
+
+              <Route path="caregiver" element={<CaregiverView />} />
+              <Route path="caregiver/alerts" element={<CaregiverView />} />
+              <Route path="caregiver/schedule" element={<CaregiverView />} />
+              <Route path="caregiver/help" element={<CaregiverView />} />
+
+              <Route path="clinic" element={<ClinicDashboard />} />
+              <Route path="clinic/rides" element={<ClinicRidesBoard />} />
+              <Route path="clinic/patients" element={<ClinicPatients />} />
+              <Route path="clinic/standing-orders" element={<ClinicStandingOrders />} />
+              <Route path="clinic/returns" element={<ClinicReturnRides />} />
+              <Route path="clinic/risk-queue" element={<ClinicRiskQueue />} />
+              <Route path="clinic/reports" element={<ClinicReports />} />
+              <Route path="clinic/:sub" element={<PlaceholderPage />} />
+
+              <Route path="vendor" element={<VendorView />} />
+              <Route path="vendor/trips" element={<VendorView />} />
+              <Route path="vendor/drivers" element={<VendorView />} />
+              <Route path="vendor/issues" element={<VendorView />} />
+              <Route path="vendor/completed" element={<VendorView />} />
+            </Route>
+          </Route>
+
+          {/* Operations demo — static/sample data, all roles */}
+          <Route path="/demo/operations" element={<OperationsDemoProviders />}>
             <Route index element={<Login />} />
             <Route element={<AppLayout />}>
               <Route path="patient" element={<PatientView />} />
