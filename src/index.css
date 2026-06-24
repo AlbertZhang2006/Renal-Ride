@@ -70,3 +70,22 @@ body {
   70% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
   100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
 }
+
+@keyframes rr-hero-up {
+  from { opacity: 0; transform: translateY(28px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.rr-reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.rr-reveal.rr-visible { opacity: 1; transform: none; }
+.rr-delay-1 { transition-delay: 0.1s; }
+.rr-delay-2 { transition-delay: 0.2s; }
+.rr-delay-3 { transition-delay: 0.3s; }
+.rr-delay-4 { transition-delay: 0.4s; }
+
+.rr-scroll-hide::-webkit-scrollbar { display: none; }
+.rr-scroll-hide { -ms-overflow-style: none; scrollbar-width: none; }
