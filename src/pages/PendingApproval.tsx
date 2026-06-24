@@ -37,9 +37,9 @@ export function PendingApproval() {
           <Link to="/" className="flex items-center gap-2">
             <div className="h-7 w-7 rounded-lg bg-brand-600 flex items-center justify-center">
               <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 32 32" stroke="currentColor">
-                <path strokeLinecap="round" strokeWidth={3} d="M6.5 19.5C9 19.5 11 17.5 13.5 15.5S18 13.5 20 15s3.5 4 6 4" />
-                <circle cx="6.5" cy="19.5" r="2.5" fill="currentColor" stroke="none" />
-                <circle cx="26" cy="19" r="2.5" fill="#34d399" stroke="none" />
+                <path d="M12 9C12 7 10 6 8 6C5.5 6 4 9.5 4 16C4 22.5 5.5 26 8 26C10 26 12 25 12 23C12 21 10 19 10 16C10 13 12 11 12 9Z" fill="currentColor" stroke="none" />
+                <path d="M20 9C20 7 22 6 24 6C26.5 6 28 9.5 28 16C28 22.5 26.5 26 24 26C22 26 20 25 20 23C20 21 22 19 22 16C22 13 20 11 20 9Z" fill="currentColor" stroke="none" />
+                <line x1="12" y1="16" x2="20" y2="16" stroke="currentColor" strokeWidth={2} strokeLinecap="round" />
               </svg>
             </div>
             <span className="text-sm font-semibold text-gray-900">Renal Ride</span>
